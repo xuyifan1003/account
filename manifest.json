@@ -1,0 +1,21 @@
+{
+  "name": "极简记账",
+  "short_name": "记账",
+  "description": "快速记账，轻松管理资产",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f5f7fa",
+  "theme_color": "#00A9A5",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><rect width='48' height='48' rx='10' fill='%2300A9A5'/><text x='24' y='33' font-size='28' text-anchor='middle' fill='white'>💰</text></svg>",
+      "sizes": "48x48",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='30' fill='%2300A9A5'/><text x='96' y='130' font-size='100' text-anchor='middle' fill='white'>💰</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ]
+}
