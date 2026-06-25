@@ -15,7 +15,7 @@
 .page {
   flex: 1;
   overflow-y: auto;
-  padding: var(--safe-top, 0px) 16px calc(80px + var(--safe-bottom));
+  padding: var(--safe-top, 16px) 16px calc(80px + var(--safe-bottom));
   display: none;
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
