@@ -3,15 +3,6 @@ import { formatMoney, showToast } from './utils.js';
 
 let editingAssetId = null;
 
-/* ===== Render Assets Header ===== */
-export function renderAssetsHeader() {
-  const state = getState();
-  const total = state.assets.reduce((s, a) => s + (Number(a.balance) || 0), 0);
-  document.getElementById('header').querySelector('h1').textContent = '总资产';
-  document.getElementById('header-expense').textContent = `¥${formatMoney(total)}`;
-  document.getElementById('header-expense').classList.remove('hidden');
-}
-
 /* ===== Render Assets ===== */
 export function renderAssets() {
   const container = document.getElementById('assets-list');
@@ -59,7 +50,6 @@ function saveAsset() {
     saveState();
     closeAssetModal();
     renderAssets();
-    renderAssetsHeader();
     showToast(`✓ ${asset.name} ¥${formatMoney(balance)}`);
   }
 }

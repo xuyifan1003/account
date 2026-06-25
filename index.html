@@ -18,12 +18,15 @@
 
   <!-- Header -->
   <header id="header">
-    <h1>本月支出</h1>
-    <span id="header-expense">0.00</span>
+    <h1>极简记账</h1>
   </header>
 
   <!-- ===== Tab 1: 记账 ===== -->
   <section id="page-book" class="page active">
+    <div class="summary-card">
+      <div class="summary-label">当月支出</div>
+      <div class="summary-amount" id="monthly-expense">0.00</div>
+    </div>
     <div class="section-title">选择分类</div>
     <div id="category-grid"></div>
 
@@ -33,7 +36,7 @@
 
   <!-- ===== Tab 2: 资产 ===== -->
   <section id="page-assets" class="page">
-    <div class="assets-summary">
+    <div class="summary-card">
       <div class="summary-label">总资产</div>
       <div class="summary-amount" id="total-assets">0.00</div>
     </div>

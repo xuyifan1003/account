@@ -7,8 +7,8 @@ let modalAmount = '0';
 let modalHasDecimal = false;
 let modalDecimalDigits = 0;
 
-/* ===== Header: Monthly Expense ===== */
-export function renderBookHeader() {
+/* ===== Book Summary: Monthly Expense ===== */
+export function renderBookSummary() {
   const state = getState();
   const now = new Date();
   const monthPrefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -17,9 +17,7 @@ export function renderBookHeader() {
     .filter(r => r.date.startsWith(monthPrefix) && r.type === 'expense')
     .reduce((s, r) => s + r.amount, 0);
 
-  document.getElementById('header').querySelector('h1').textContent = '本月支出';
-  document.getElementById('header-expense').textContent = `¥${formatMoney(totalExpense)}`;
-  document.getElementById('header-expense').classList.remove('hidden');
+  document.getElementById('monthly-expense').textContent = formatMoney(totalExpense);
 }
 
 /* ===== Categories Grid ===== */
@@ -110,7 +108,7 @@ function handleNumpad(key) {
     saveState();
     closeAmountModal();
     renderRecords();
-    renderBookHeader();
+    renderBookSummary();
     showToast(`✓ ${cat.name} ${formatMoney(val)} 元`);
     return;
   }
@@ -179,6 +177,6 @@ export function initBook() {
   // Auto-refresh records every minute
   setInterval(() => {
     renderRecords();
-    renderBookHeader();
+    renderBookSummary();
   }, 60000);
 }

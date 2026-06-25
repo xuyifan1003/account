@@ -9,49 +9,13 @@
 }
 
 /* ===== Header ===== */
-#header {
-  height: var(--header-height);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-  background: var(--card);
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-  z-index: 10;
-  position: relative;
-}
-#header::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  left: 20px;
-  right: 20px;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--border), transparent);
-}
-#header h1 {
-  font-size: 18px;
-  font-weight: 700;
-  background: var(--primary-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: -0.5px;
-}
-#header-expense {
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--danger);
-  letter-spacing: -0.5px;
-}
-#header-expense.hidden { display: none; }
+#header { display: none; }
 
 /* ===== Pages ===== */
 .page {
   flex: 1;
   overflow-y: auto;
-  padding: 16px 16px calc(80px + var(--safe-bottom));
+  padding: var(--safe-top, 0px) 16px calc(80px + var(--safe-bottom));
   display: none;
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
