@@ -31,7 +31,7 @@
   background: linear-gradient(90deg, transparent, var(--border), transparent);
 }
 #header h1 {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
   background: var(--primary-gradient);
   -webkit-background-clip: text;
@@ -39,14 +39,13 @@
   background-clip: text;
   letter-spacing: -0.5px;
 }
-#today-display {
-  font-size: 13px;
-  color: var(--text-secondary);
-  font-weight: 500;
-  background: var(--bg);
-  padding: 4px 12px;
-  border-radius: 20px;
+#header-expense {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--danger);
+  letter-spacing: -0.5px;
 }
+#header-expense.hidden { display: none; }
 
 /* ===== Pages ===== */
 .page {

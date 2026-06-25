@@ -79,8 +79,11 @@
 }
 .asset-item .asset-icon.wx { background: linear-gradient(135deg, #D1FAE5, #A7F3D0); }
 .asset-item .asset-icon.alipay { background: linear-gradient(135deg, #E0E7FF, #C7D2FE); }
-.asset-item .asset-icon.cash { background: linear-gradient(135deg, #FEF3C7, #FDE68A); }
-.asset-item .asset-icon.card { background: linear-gradient(135deg, #EDE9FE, #DDD6FE); }
+.asset-item .asset-icon.icbc { background: linear-gradient(135deg, #FEE2E2, #FECACA); }
+.asset-item .asset-icon.boc { background: linear-gradient(135deg, #FEE2E2, #FCA5A5); }
+.asset-item .asset-icon.nfjj { background: linear-gradient(135deg, #FEF3C7, #FDE68A); }
+.asset-item .asset-icon.zfbjj { background: linear-gradient(135deg, #EDE9FE, #DDD6FE); }
+.asset-item .asset-icon.gold { background: linear-gradient(135deg, #FEF3C7, #FBBF24); }
 .asset-item .asset-icon.default { background: var(--primary-soft); }
 .asset-item .asset-info { flex: 1; }
 .asset-item .asset-name { font-weight: 600; font-size: 15px; color: var(--text); }
@@ -180,15 +183,16 @@
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 .chart-icon.food { background: linear-gradient(135deg, #FFE4E6, #FECDD3); }
-.chart-icon.transport { background: linear-gradient(135deg, #E0E7FF, #C7D2FE); }
-.chart-icon.shopping { background: linear-gradient(135deg, #FEF3C7, #FDE68A); }
-.chart-icon.entertainment { background: linear-gradient(135deg, #EDE9FE, #DDD6FE); }
 .chart-icon.daily { background: linear-gradient(135deg, #DBEAFE, #BFDBFE); }
+.chart-icon.transport { background: linear-gradient(135deg, #E0E7FF, #C7D2FE); }
+.chart-icon.clothing { background: linear-gradient(135deg, #FCE7F3, #FBCFE8); }
+.chart-icon.entertainment { background: linear-gradient(135deg, #EDE9FE, #DDD6FE); }
 .chart-icon.communication { background: linear-gradient(135deg, #E0F2FE, #BAE6FD); }
-.chart-icon.medical { background: linear-gradient(135deg, #FCE7F3, #FBCFE8); }
-.chart-icon.education { background: linear-gradient(135deg, #D1FAE5, #A7F3D0); }
-.chart-icon.salary { background: linear-gradient(135deg, #D1FAE5, #A7F3D0); }
-.chart-icon.other { background: linear-gradient(135deg, #F1F5F9, #E2E8F0); }
+.chart-icon.digital { background: linear-gradient(135deg, #F1F5F9, #CBD5E1); }
+.chart-icon.medical { background: linear-gradient(135deg, #FEE2E2, #FECACA); }
+.chart-icon.housing { background: linear-gradient(135deg, #FEF3C7, #FDE68A); }
+.chart-icon.study { background: linear-gradient(135deg, #D1FAE5, #A7F3D0); }
+.chart-icon.social { background: linear-gradient(135deg, #FFEDD5, #FED7AA); }
 
 .chart-bar-wrap {
   flex: 1;

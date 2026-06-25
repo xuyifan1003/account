@@ -7,6 +7,21 @@ let modalAmount = '0';
 let modalHasDecimal = false;
 let modalDecimalDigits = 0;
 
+/* ===== Header: Monthly Expense ===== */
+export function renderBookHeader() {
+  const state = getState();
+  const now = new Date();
+  const monthPrefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+  const totalExpense = state.records
+    .filter(r => r.date.startsWith(monthPrefix) && r.type === 'expense')
+    .reduce((s, r) => s + r.amount, 0);
+
+  document.getElementById('header').querySelector('h1').textContent = '本月支出';
+  document.getElementById('header-expense').textContent = `¥${formatMoney(totalExpense)}`;
+  document.getElementById('header-expense').classList.remove('hidden');
+}
+
 /* ===== Categories Grid ===== */
 export function renderCategories() {
   const grid = document.getElementById('category-grid');
@@ -95,6 +110,7 @@ function handleNumpad(key) {
     saveState();
     closeAmountModal();
     renderRecords();
+    renderBookHeader();
     showToast(`✓ ${cat.name} ${formatMoney(val)} 元`);
     return;
   }
@@ -161,5 +177,8 @@ export function initBook() {
   document.querySelector('#amount-modal .modal-overlay').addEventListener('click', closeAmountModal);
 
   // Auto-refresh records every minute
-  setInterval(renderRecords, 60000);
+  setInterval(() => {
+    renderRecords();
+    renderBookHeader();
+  }, 60000);
 }

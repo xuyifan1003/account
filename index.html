@@ -18,8 +18,8 @@
 
   <!-- Header -->
   <header id="header">
-    <h1>极简记账</h1>
-    <span id="today-display"></span>
+    <h1>本月支出</h1>
+    <span id="header-expense">0.00</span>
   </header>
 
   <!-- ===== Tab 1: 记账 ===== -->
@@ -38,7 +38,6 @@
       <div class="summary-amount" id="total-assets">0.00</div>
     </div>
     <div id="assets-list"></div>
-    <button class="fab" id="btn-add-asset">+</button>
   </section>
 
   <!-- ===== Tab 3: 报表 ===== -->
@@ -90,11 +89,11 @@
       <input type="text" id="input-note" placeholder="添加备注..." maxlength="20">
     </div>
     <div class="numpad">
-      <button data-key="7">7</button><button data-key="8">8</button><button data-key="9">9</button>
+      <button data-key="7">7</button><button data-key="8">8</button><button data-key="9">9</button><button class="key-del" data-key="del">⌫</button>
+      <button class="key-confirm" data-key="confirm">✓</button>
       <button data-key="4">4</button><button data-key="5">5</button><button data-key="6">6</button>
       <button data-key="1">1</button><button data-key="2">2</button><button data-key="3">3</button>
-      <button data-key="0">0</button><button data-key=".">.</button><button class="key-del" data-key="del">⌫</button>
-      <button class="key-confirm" data-key="confirm">✓</button>
+      <button data-key="0">0</button><button data-key=".">.</button>
     </div>
   </div>
 </div>
@@ -104,16 +103,13 @@
   <div class="modal-overlay"></div>
   <div class="modal-content modal-sm">
     <div class="modal-header">
-      <span id="asset-modal-title">添加资产</span>
+      <span id="asset-modal-title">编辑资产</span>
       <button class="modal-close" id="asset-close">✕</button>
     </div>
     <div class="asset-form">
-      <input type="text" id="asset-name" placeholder="资产名称" maxlength="10">
+      <div class="asset-name-display" id="asset-name-display"></div>
       <input type="number" id="asset-balance" placeholder="余额" step="0.01">
       <button class="btn-primary" id="asset-save">保存</button>
-    </div>
-    <div id="asset-delete-row" class="hidden">
-      <button class="btn-danger" id="asset-delete">删除此资产</button>
     </div>
   </div>
 </div>

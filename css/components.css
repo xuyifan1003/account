@@ -46,15 +46,16 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 .cat-icon-wrap.food { background: linear-gradient(135deg, #FFE4E6, #FECDD3); }
-.cat-icon-wrap.transport { background: linear-gradient(135deg, #E0E7FF, #C7D2FE); }
-.cat-icon-wrap.shopping { background: linear-gradient(135deg, #FEF3C7, #FDE68A); }
-.cat-icon-wrap.entertainment { background: linear-gradient(135deg, #EDE9FE, #DDD6FE); }
 .cat-icon-wrap.daily { background: linear-gradient(135deg, #DBEAFE, #BFDBFE); }
+.cat-icon-wrap.transport { background: linear-gradient(135deg, #E0E7FF, #C7D2FE); }
+.cat-icon-wrap.clothing { background: linear-gradient(135deg, #FCE7F3, #FBCFE8); }
+.cat-icon-wrap.entertainment { background: linear-gradient(135deg, #EDE9FE, #DDD6FE); }
 .cat-icon-wrap.communication { background: linear-gradient(135deg, #E0F2FE, #BAE6FD); }
-.cat-icon-wrap.medical { background: linear-gradient(135deg, #FCE7F3, #FBCFE8); }
-.cat-icon-wrap.education { background: linear-gradient(135deg, #D1FAE5, #A7F3D0); }
-.cat-icon-wrap.salary { background: linear-gradient(135deg, #D1FAE5, #A7F3D0); }
-.cat-icon-wrap.other { background: linear-gradient(135deg, #F1F5F9, #E2E8F0); }
+.cat-icon-wrap.digital { background: linear-gradient(135deg, #F1F5F9, #CBD5E1); }
+.cat-icon-wrap.medical { background: linear-gradient(135deg, #FEE2E2, #FECACA); }
+.cat-icon-wrap.housing { background: linear-gradient(135deg, #FEF3C7, #FDE68A); }
+.cat-icon-wrap.study { background: linear-gradient(135deg, #D1FAE5, #A7F3D0); }
+.cat-icon-wrap.social { background: linear-gradient(135deg, #FFEDD5, #FED7AA); }
 
 .cat-btn .cat-name {
   font-size: 12px;
@@ -268,13 +269,16 @@
   background: var(--border);
 }
 .numpad .key-confirm {
+  grid-row: 2 / span 3;
+  grid-column: 4;
   background: var(--primary-gradient);
   color: #fff;
-  font-size: 22px;
+  font-size: 26px;
+  font-weight: 700;
   box-shadow: 0 4px 12px rgba(108, 99, 255, 0.35);
 }
 .numpad .key-confirm:active {
-  transform: scale(0.94);
+  transform: scale(0.96);
   box-shadow: 0 2px 6px rgba(108, 99, 255, 0.3);
 }
 .numpad .key-del {
@@ -337,6 +341,17 @@
 
 /* ===== Asset Form ===== */
 .asset-form { display: flex; flex-direction: column; gap: 12px; }
+.asset-name-display {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  padding: 12px 16px;
+  background: var(--bg);
+  border-radius: var(--radius-xs);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 .asset-form input {
   padding: 14px 16px;
   border: 2px solid var(--border);

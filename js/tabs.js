@@ -1,7 +1,8 @@
 import { renderReport } from './report.js';
-import { renderAssets } from './assets.js';
+import { renderAssets, renderAssetsHeader } from './assets.js';
+import { renderBookHeader } from './book.js';
 
-const titles = { book:'极简记账', assets:'资产', report:'报表' };
+const titles = { report:'报表' };
 
 export function switchTab(tabName) {
   document.querySelectorAll('.tab').forEach(t =>
@@ -11,8 +12,15 @@ export function switchTab(tabName) {
     p.classList.toggle('active', p.id === `page-${tabName}`)
   );
 
-  const h1 = document.getElementById('header').querySelector('h1');
-  h1.textContent = titles[tabName] || '极简记账';
+  if (tabName === 'book') {
+    renderBookHeader();
+  } else if (tabName === 'assets') {
+    renderAssetsHeader();
+  } else {
+    const h1 = document.getElementById('header').querySelector('h1');
+    h1.textContent = titles[tabName] || '极简记账';
+    document.getElementById('header-expense').classList.add('hidden');
+  }
 
   if (tabName === 'report') renderReport();
   if (tabName === 'assets') renderAssets();
