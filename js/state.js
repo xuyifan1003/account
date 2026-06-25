@@ -1,3 +1,5 @@
+import { getDb } from './db.js';
+
 /* ===== Categories & Default Assets ===== */
 export const CATEGORIES = [
   { id:'food', name:'餐饮', icon:'🍜', type:'expense' },
@@ -26,28 +28,51 @@ const DEFAULT_ASSETS = [
 /* ===== State Management ===== */
 let state = null;
 
-export function initState() {
+function mapAssetFromDb(a) {
+  return { id: a.id, name: a.name, icon: a.icon, iconClass: a.icon_class, balance: a.balance, sort: a.sort };
+}
+
+function mapAssetToDb(a) {
+  return { id: a.id, name: a.name, icon: a.icon, icon_class: a.iconClass, balance: a.balance, sort: a.sort };
+}
+
+export async function initState() {
   try {
-    const raw = localStorage.getItem('money_state');
-    if (raw) {
-      state = JSON.parse(raw);
-      if (!state.records) state.records = [];
-      if (!state.assets || state.assets.length === 0) {
-        state.assets = JSON.parse(JSON.stringify(DEFAULT_ASSETS));
+    const db = await getDb();
+    const [recordsRes, assetsRes] = await Promise.all([
+      db.from('records').select('*').order('date', { ascending: false }).order('time', { ascending: false }),
+      db.from('assets').select('*').order('sort', { ascending: true }),
+    ]);
+
+    if (!recordsRes.error && !assetsRes.error) {
+      const records = recordsRes.data || [];
+      const assets = (assetsRes.data || []).map(mapAssetFromDb);
+
+      if (assets.length === 0) {
+        state = { records, assets: JSON.parse(JSON.stringify(DEFAULT_ASSETS)) };
+        db.from('assets').upsert(state.assets.map(mapAssetToDb), { onConflict: 'id' }).catch(() => {});
+      } else {
+        state = { records, assets };
       }
       return;
     }
   } catch(e) {}
+
   state = { records: [], assets: JSON.parse(JSON.stringify(DEFAULT_ASSETS)) };
 }
 
 export function getState() {
-  if (!state) initState();
+  if (!state) {
+    state = { records: [], assets: JSON.parse(JSON.stringify(DEFAULT_ASSETS)) };
+  }
   return state;
 }
 
 export function saveState() {
-  localStorage.setItem('money_state', JSON.stringify(state));
+  getDb().then(db => {
+    db.from('records').upsert(state.records, { onConflict: 'id' }).catch(() => {});
+    db.from('assets').upsert(state.assets.map(mapAssetToDb), { onConflict: 'id' }).catch(() => {});
+  }).catch(() => {});
 }
 
 /* ===== Category Lookup ===== */

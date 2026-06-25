@@ -5,9 +5,9 @@ import { initAssets } from './assets.js';
 import { initReport } from './report.js';
 
 /* ===== App Entry ===== */
-function init() {
-  // Load data
-  initState();
+async function init() {
+  // Load data (Supabase → localStorage fallback)
+  await initState();
 
   // Init modules
   initTabs();
