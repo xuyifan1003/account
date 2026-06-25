@@ -1,0 +1,59 @@
+/* ===== Design Tokens ===== */
+:root {
+  /* Colors */
+  --primary: #6C63FF;
+  --primary-light: #EEECFF;
+  --primary-dark: #5A52E0;
+  --primary-gradient: linear-gradient(135deg, #6C63FF 0%, #8B5CF6 100%);
+  --primary-soft: linear-gradient(135deg, #EEECFF 0%, #E0E7FF 100%);
+
+  --success: #10B981;
+  --success-light: #D1FAE5;
+  --danger: #EF4444;
+  --danger-light: #FEE2E2;
+  --warning: #F59E0B;
+  --warning-light: #FEF3C7;
+
+  --bg: #F0F2F6;
+  --card: #FFFFFF;
+  --text: #0F172A;
+  --text-secondary: #64748B;
+  --text-tertiary: #94A3B8;
+  --border: #E2E8F0;
+
+  /* Shadows */
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(108, 99, 255, 0.06);
+  --card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(108, 99, 255, 0.1);
+
+  /* Radius */
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-xs: 8px;
+
+  /* Dimensions */
+  --tab-height: 70px;
+  --header-height: 56px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+
+  /* Transitions */
+  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===== Reset ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+/* ===== Utility ===== */
+.hidden { display: none !important; }

@@ -2,34 +2,36 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<meta name="theme-color" content="#00A9A5">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#6C63FF">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="manifest" href="manifest.json">
 <title>极简记账</title>
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/pages.css">
 </head>
 <body>
 <div id="app">
+
   <!-- Header -->
   <header id="header">
     <h1>极简记账</h1>
     <span id="today-display"></span>
   </header>
 
-  <!-- ===== Page 1: 记账 ===== -->
+  <!-- ===== Tab 1: 记账 ===== -->
   <section id="page-book" class="page active">
-    <!-- Category Grid -->
     <div class="section-title">选择分类</div>
     <div id="category-grid"></div>
 
-    <!-- Recent Records -->
-    <div class="section-title" style="margin-top:16px">最近记录</div>
+    <div class="section-title" style="margin-top:20px">今日记录</div>
     <div id="records-list"></div>
   </section>
 
-  <!-- ===== Page 2: 资产 ===== -->
+  <!-- ===== Tab 2: 资产 ===== -->
   <section id="page-assets" class="page">
     <div class="assets-summary">
       <div class="summary-label">总资产</div>
@@ -39,7 +41,7 @@
     <button class="fab" id="btn-add-asset">+</button>
   </section>
 
-  <!-- ===== Page 3: 报表 ===== -->
+  <!-- ===== Tab 3: 报表 ===== -->
   <section id="page-report" class="page">
     <div class="month-nav">
       <button class="month-btn" id="prev-month">‹</button>
@@ -47,32 +49,32 @@
       <button class="month-btn" id="next-month">›</button>
     </div>
     <div class="report-cards">
-      <div class="r-card income"><div class="r-label">收入</div><div class="r-val" id="r-income">0</div></div>
-      <div class="r-card expense"><div class="r-label">支出</div><div class="r-val" id="r-expense">0</div></div>
+      <div class="r-card income"><div class="r-label">收入</div><div class="r-val" id="r-income">0.00</div></div>
+      <div class="r-card expense"><div class="r-label">支出</div><div class="r-val" id="r-expense">0.00</div></div>
     </div>
     <div class="section-title">分类支出排行</div>
     <div id="report-chart"></div>
     <div class="empty-tip" id="report-empty">本月暂无记录</div>
   </section>
 
-  <!-- Bottom Tab Bar -->
+  <!-- ===== Bottom Tab Bar ===== -->
   <nav id="tab-bar">
-    <div class="tab active" data-tab="book">
+    <button class="tab active" data-tab="book">
       <span class="tab-icon">📝</span>
       <span class="tab-label">记账</span>
-    </div>
-    <div class="tab" data-tab="assets">
+    </button>
+    <button class="tab" data-tab="assets">
       <span class="tab-icon">🏦</span>
       <span class="tab-label">资产</span>
-    </div>
-    <div class="tab" data-tab="report">
+    </button>
+    <button class="tab" data-tab="report">
       <span class="tab-icon">📊</span>
       <span class="tab-label">报表</span>
-    </div>
+    </button>
   </nav>
 </div>
 
-<!-- ===== Amount Input Modal ===== -->
+<!-- ===== Amount Modal ===== -->
 <div id="amount-modal" class="modal hidden">
   <div class="modal-overlay"></div>
   <div class="modal-content">
@@ -85,7 +87,7 @@
       <span id="amount-value">0</span>
     </div>
     <div id="note-row">
-      <input type="text" id="input-note" placeholder="添加备注（可选）" maxlength="20">
+      <input type="text" id="input-note" placeholder="添加备注..." maxlength="20">
     </div>
     <div class="numpad">
       <button data-key="7">7</button><button data-key="8">8</button><button data-key="9">9</button>
@@ -106,7 +108,7 @@
       <button class="modal-close" id="asset-close">✕</button>
     </div>
     <div class="asset-form">
-      <input type="text" id="asset-name" placeholder="资产名称（如 微信）" maxlength="10">
+      <input type="text" id="asset-name" placeholder="资产名称" maxlength="10">
       <input type="number" id="asset-balance" placeholder="余额" step="0.01">
       <button class="btn-primary" id="asset-save">保存</button>
     </div>
@@ -116,6 +118,6 @@
   </div>
 </div>
 
-<script src="app.js"></script>
+<script type="module" src="js/app.js"></script>
 </body>
 </html>

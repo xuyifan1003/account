@@ -1,5 +1,19 @@
-const CACHE = 'money-book-v1';
-const URLS = ['index.html', 'styles.css', 'app.js', 'manifest.json'];
+const CACHE = 'money-book-v2';
+const URLS = [
+  'index.html',
+  'manifest.json',
+  'css/variables.css',
+  'css/layout.css',
+  'css/components.css',
+  'css/pages.css',
+  'js/state.js',
+  'js/utils.js',
+  'js/tabs.js',
+  'js/book.js',
+  'js/assets.js',
+  'js/report.js',
+  'js/app.js',
+];
 
 self.addEventListener('install', e => {
   e.waitUntil(
