@@ -3,6 +3,7 @@ import { getToday, getNow, formatMoney, genId, showToast, shakeElement, haptic }
 
 /* ===== Modal State ===== */
 let selectedCategory = null;
+let editingRecordId = null;
 let modalAmount = '0';
 let modalHasDecimal = false;
 let modalDecimalDigits = 0;
@@ -45,100 +46,59 @@ export function renderRecords() {
   const todayRecords = getState().records.filter(r => r.date === getToday());
 
   if (todayRecords.length === 0) {
-    container.innerHTML = '<div class="empty-tip">今天还没有记录<br>点击上方分类开始记账</div>';
+    container.innerHTML = '<div class="empty-tip">今天还没有记录<br>长按已有记录可修改或删除</div>';
     return;
   }
 
   container.innerHTML = todayRecords.map((r, i) => {
     const cat = getCategory(r.category);
     return `
-      <div class="swipe-wrap" data-id="${r.id}">
-        <div class="record-item" style="animation-delay:${i * 0.03}s">
-          <div class="record-icon-wrap ${r.category}">${cat.icon}</div>
-          <div class="record-info">
-            <div class="record-cat">${cat.name}</div>
-            ${r.note ? `<div class="record-note">${r.note}</div>` : ''}
-          </div>
-          <div class="record-right">
-            <div class="record-amount">¥${formatMoney(r.amount)}</div>
-            <div class="record-time">${r.time}</div>
-          </div>
+      <div class="record-item" data-id="${r.id}" style="animation-delay:${i * 0.03}s">
+        <div class="record-icon-wrap ${r.category}">${cat.icon}</div>
+        <div class="record-info">
+          <div class="record-cat">${cat.name}</div>
+          ${r.note ? `<div class="record-note">${r.note}</div>` : ''}
         </div>
-        <div class="record-delete">删除</div>
+        <div class="record-right">
+          <div class="record-amount">¥${formatMoney(r.amount)}</div>
+          <div class="record-time">${r.time}</div>
+        </div>
       </div>
     `;
   }).join('');
 }
 
-function initSwipeDelete() {
-  const list = document.getElementById('records-list');
-  let startX = 0, moveX = 0, current = null;
-
-  function closeCurrent() {
-    if (!current) return;
-    current.item.style.transition = 'transform 0.2s ease';
-    current.item.style.transform = '';
-    current.wrap.dataset.swiped = 'false';
-    current = null;
-  }
-
-  list.addEventListener('touchstart', e => {
-    const wrap = e.target.closest('.swipe-wrap');
-    if (!wrap) { closeCurrent(); return; }
-    if (current && current.wrap !== wrap) closeCurrent();
-    current = { wrap, item: wrap.querySelector('.record-item') };
-    startX = e.touches[0].clientX;
-    moveX = startX;
-  }, { passive: true });
-
-  list.addEventListener('touchmove', e => {
-    if (!current) return;
-    moveX = e.touches[0].clientX;
-    const dx = Math.max(Math.min(moveX - startX, 0), -70);
-    current.item.style.transition = 'none';
-    current.item.style.transform = `translateX(${dx}px)`;
-  }, { passive: true });
-
-  list.addEventListener('touchend', () => {
-    if (!current) return;
-    const dx = moveX - startX;
-    current.item.style.transition = 'transform 0.2s ease';
-    if (dx < -40) {
-      current.item.style.transform = 'translateX(-70px)';
-      current.wrap.dataset.swiped = 'true';
-    }
-    current = null;
-  });
-
-  list.addEventListener('click', e => {
-    const del = e.target.closest('.record-delete');
-    if (!del) { closeCurrent(); return; }
-    const id = del.closest('.swipe-wrap').dataset.id;
-    closeCurrent();
-    const state = getState();
-    state.records = state.records.filter(r => r.id !== id);
-    saveState();
-    renderRecords();
-    renderBookSummary();
-    showToast('已删除');
-  });
-}
-
 /* ===== Amount Modal ===== */
-function openAmountModal(catId) {
-  const cat = getCategory(catId);
-  document.getElementById('modal-category-name').textContent = cat.icon + ' ' + cat.name;
-  document.getElementById('amount-value').textContent = '0';
-  document.getElementById('input-note').value = '';
+function openAmountModal(catId, editRecord = null) {
+  if (editRecord) {
+    editingRecordId = editRecord.id;
+    selectedCategory = editRecord.category;
+    const cat = getCategory(editRecord.category);
+    document.getElementById('modal-category-name').textContent = cat.icon + ' ' + cat.name;
+    modalAmount = String(editRecord.amount);
+    modalHasDecimal = modalAmount.includes('.');
+    modalDecimalDigits = modalHasDecimal ? modalAmount.split('.')[1].length : 0;
+    document.getElementById('amount-value').textContent = modalAmount;
+    document.getElementById('input-note').value = editRecord.note || '';
+    document.getElementById('record-delete-row').style.display = 'block';
+  } else {
+    editingRecordId = null;
+    selectedCategory = catId;
+    const cat = getCategory(catId);
+    document.getElementById('modal-category-name').textContent = cat.icon + ' ' + cat.name;
+    document.getElementById('amount-value').textContent = '0';
+    document.getElementById('input-note').value = '';
+    document.getElementById('record-delete-row').style.display = 'none';
+    modalAmount = '0';
+    modalHasDecimal = false;
+    modalDecimalDigits = 0;
+  }
   document.getElementById('amount-modal').classList.remove('hidden');
-  // Reset numpad state
-  modalAmount = '0';
-  modalHasDecimal = false;
-  modalDecimalDigits = 0;
 }
 
 function closeAmountModal() {
   document.getElementById('amount-modal').classList.add('hidden');
+  editingRecordId = null;
 }
 
 /* ===== Numpad ===== */
@@ -150,10 +110,25 @@ function handleNumpad(key) {
       shakeElement(document.querySelector('.amount-display'));
       return;
     }
-    if (!selectedCategory) return;
 
-    const cat = getCategory(selectedCategory);
     const state = getState();
+    if (editingRecordId) {
+      const record = state.records.find(r => r.id === editingRecordId);
+      if (record) {
+        record.amount = val;
+        record.note = document.getElementById('input-note').value.trim();
+      }
+      editingRecordId = null;
+      saveState();
+      closeAmountModal();
+      renderRecords();
+      renderBookSummary();
+      showToast('已保存');
+      return;
+    }
+
+    if (!selectedCategory) return;
+    const cat = getCategory(selectedCategory);
     state.records.unshift({
       id: genId(),
       category: selectedCategory,
@@ -222,7 +197,37 @@ function updateAmountDisplay() {
 export function initBook() {
   renderCategories();
   renderRecords();
-  initSwipeDelete();
+
+  // Long press on record items → edit/delete
+  let lpTimer = null;
+  const list = document.getElementById('records-list');
+  list.addEventListener('pointerdown', e => {
+    const item = e.target.closest('.record-item');
+    if (!item) return;
+    const id = item.dataset.id;
+    if (!id) return;
+    lpTimer = setTimeout(() => {
+      haptic();
+      const record = getState().records.find(r => r.id === id);
+      if (record) openAmountModal(record.category, record);
+    }, 500);
+  });
+  list.addEventListener('pointermove', () => { clearTimeout(lpTimer); });
+  list.addEventListener('pointerup', () => { clearTimeout(lpTimer); });
+  list.addEventListener('pointercancel', () => { clearTimeout(lpTimer); });
+
+  // Delete button inside modal
+  document.getElementById('record-modal-delete').addEventListener('click', () => {
+    if (!editingRecordId) return;
+    const state = getState();
+    state.records = state.records.filter(r => r.id !== editingRecordId);
+    editingRecordId = null;
+    saveState();
+    closeAmountModal();
+    renderRecords();
+    renderBookSummary();
+    showToast('已删除');
+  });
 
   // Numpad
   document.querySelectorAll('.numpad button').forEach(btn => {
