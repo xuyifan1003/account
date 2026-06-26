@@ -47,7 +47,7 @@
   overflow: hidden;
   padding-top: 2px;
 }
-.report-trend-fixed { flex-shrink: 0; }
+.report-trend-fixed { flex-shrink: 0; padding-top: 10px; }
 .page.active { display: block; animation: pageIn 0.25s ease; }
 @keyframes pageIn {
   from { opacity: 0; transform: translateY(8px); }
