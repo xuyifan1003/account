@@ -1,5 +1,6 @@
 import { CATEGORIES, getState, saveState, getCategory } from './state.js';
 import { getToday, getNow, formatMoney, genId, showToast, shakeElement, haptic } from './utils.js';
+import { api } from './db.js';
 
 /* ===== Modal State ===== */
 let selectedCategory = null;
@@ -211,8 +212,10 @@ export function initBook() {
     if (!deletingId) return;
     const state = getState();
     state.records = state.records.filter(r => r.id !== deletingId);
+    const id = deletingId;
     deletingId = null;
     saveState();
+    api('DELETE', 'records', null, `id=eq.${id}`).catch(e => console.warn('delete failed:', e));
     closeDelete();
     renderRecords();
     renderBookSummary();
