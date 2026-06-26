@@ -42,6 +42,8 @@
 .report-top { flex-shrink: 0; }
 .report-scroll {
   flex: 1;
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding-top: 2px;

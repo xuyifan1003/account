@@ -9,7 +9,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 16px 6px 12px;
+  padding: 12px 6px 8px;
   border: none;
   border-radius: var(--radius-sm);
   background: var(--card);
@@ -55,6 +55,12 @@
 /* ===== Records List ===== */
 #records-list { display: flex; flex-direction: column; gap: 8px; }
 
+.swipe-wrap {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+}
+
 .record-item {
   display: flex;
   align-items: center;
@@ -63,10 +69,27 @@
   border-radius: var(--radius-sm);
   box-shadow: var(--card-shadow);
   animation: recordIn 0.3s ease backwards;
-  transition: transform 0.15s;
   border: 1px solid rgba(226, 232, 240, 0.5);
+  position: relative;
+  z-index: 2;
 }
 .record-item:active { transform: scale(0.98); }
+
+.record-delete {
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: 70px;
+  background: linear-gradient(135deg, #EF4444, #DC2626);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  cursor: pointer;
+  z-index: 1;
+}
 @keyframes recordIn {
   from { opacity: 0; transform: translateY(10px) scale(0.98); }
   to { opacity: 1; transform: translateY(0) scale(1); }
@@ -118,9 +141,8 @@
   font-weight: 700;
   font-size: 16px;
   letter-spacing: -0.3px;
+  color: var(--text);
 }
-.record-amount.expense { color: var(--danger); }
-.record-amount.income { color: var(--success); }
 .record-time {
   font-size: 11px;
   color: var(--text-tertiary);

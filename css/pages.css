@@ -170,6 +170,7 @@
   padding: 16px;
   margin-bottom: 16px;
   box-shadow: var(--card-shadow);
+  flex: 1;
 }
 
 /* ===== Category Chart ===== */
@@ -236,17 +237,17 @@
 }
 
 /* ===== Category Bar Colors ===== */
-.cat-bar.food { background: #FB7185; }
-.cat-bar.daily { background: #60A5FA; }
-.cat-bar.transport { background: #818CF8; }
-.cat-bar.clothing { background: #F472B6; }
-.cat-bar.entertainment { background: #A78BFA; }
-.cat-bar.communication { background: #38BDF8; }
-.cat-bar.digital { background: #94A3B8; }
-.cat-bar.medical { background: #F87171; }
-.cat-bar.housing { background: #FBBF24; }
-.cat-bar.study { background: #34D399; }
-.cat-bar.social { background: #FB923C; }
+.cat-bar.food { background: #FDA4AF; }
+.cat-bar.daily { background: #93C5FD; }
+.cat-bar.transport { background: #A5B4FC; }
+.cat-bar.clothing { background: #F9A8D4; }
+.cat-bar.entertainment { background: #C4B5FD; }
+.cat-bar.communication { background: #7DD3FC; }
+.cat-bar.digital { background: #CBD5E1; }
+.cat-bar.medical { background: #FCA5A5; }
+.cat-bar.housing { background: #FCD34D; }
+.cat-bar.study { background: #6EE7B7; }
+.cat-bar.social { background: #FDBA74; }
 
 /* ===== Trend Chart ===== */
 #report-trend {
