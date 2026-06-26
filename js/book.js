@@ -3,7 +3,7 @@ import { getToday, getNow, formatMoney, genId, showToast, shakeElement, haptic }
 
 /* ===== Modal State ===== */
 let selectedCategory = null;
-let editingRecordId = null;
+let deletingId = null;
 let modalAmount = '0';
 let modalHasDecimal = false;
 let modalDecimalDigits = 0;
@@ -46,7 +46,7 @@ export function renderRecords() {
   const todayRecords = getState().records.filter(r => r.date === getToday());
 
   if (todayRecords.length === 0) {
-    container.innerHTML = '<div class="empty-tip">今天还没有记录<br>长按已有记录可修改或删除</div>';
+    container.innerHTML = '<div class="empty-tip">今天还没有记录<br>点击上方分类开始记账</div>';
     return;
   }
 
@@ -69,36 +69,19 @@ export function renderRecords() {
 }
 
 /* ===== Amount Modal ===== */
-function openAmountModal(catId, editRecord = null) {
-  if (editRecord) {
-    editingRecordId = editRecord.id;
-    selectedCategory = editRecord.category;
-    const cat = getCategory(editRecord.category);
-    document.getElementById('modal-category-name').textContent = cat.icon + ' ' + cat.name;
-    modalAmount = String(editRecord.amount);
-    modalHasDecimal = modalAmount.includes('.');
-    modalDecimalDigits = modalHasDecimal ? modalAmount.split('.')[1].length : 0;
-    document.getElementById('amount-value').textContent = modalAmount;
-    document.getElementById('input-note').value = editRecord.note || '';
-    document.getElementById('record-delete-row').style.display = 'block';
-  } else {
-    editingRecordId = null;
-    selectedCategory = catId;
-    const cat = getCategory(catId);
-    document.getElementById('modal-category-name').textContent = cat.icon + ' ' + cat.name;
-    document.getElementById('amount-value').textContent = '0';
-    document.getElementById('input-note').value = '';
-    document.getElementById('record-delete-row').style.display = 'none';
-    modalAmount = '0';
-    modalHasDecimal = false;
-    modalDecimalDigits = 0;
-  }
+function openAmountModal(catId) {
+  const cat = getCategory(catId);
+  document.getElementById('modal-category-name').textContent = cat.icon + ' ' + cat.name;
+  document.getElementById('amount-value').textContent = '0';
+  document.getElementById('input-note').value = '';
   document.getElementById('amount-modal').classList.remove('hidden');
+  modalAmount = '0';
+  modalHasDecimal = false;
+  modalDecimalDigits = 0;
 }
 
 function closeAmountModal() {
   document.getElementById('amount-modal').classList.add('hidden');
-  editingRecordId = null;
 }
 
 /* ===== Numpad ===== */
@@ -110,25 +93,10 @@ function handleNumpad(key) {
       shakeElement(document.querySelector('.amount-display'));
       return;
     }
-
-    const state = getState();
-    if (editingRecordId) {
-      const record = state.records.find(r => r.id === editingRecordId);
-      if (record) {
-        record.amount = val;
-        record.note = document.getElementById('input-note').value.trim();
-      }
-      editingRecordId = null;
-      saveState();
-      closeAmountModal();
-      renderRecords();
-      renderBookSummary();
-      showToast('已保存');
-      return;
-    }
-
     if (!selectedCategory) return;
+
     const cat = getCategory(selectedCategory);
+    const state = getState();
     state.records.unshift({
       id: genId(),
       category: selectedCategory,
@@ -198,7 +166,7 @@ export function initBook() {
   renderCategories();
   renderRecords();
 
-  // Long press on record items → edit/delete
+  // Long press on record items → delete
   let lpTimer = null;
   const list = document.getElementById('records-list');
   list.addEventListener('pointerdown', e => {
@@ -209,25 +177,36 @@ export function initBook() {
     lpTimer = setTimeout(() => {
       haptic();
       const record = getState().records.find(r => r.id === id);
-      if (record) openAmountModal(record.category, record);
+      if (!record) return;
+      deletingId = id;
+      const cat = getCategory(record.category);
+      document.getElementById('delete-modal-text').textContent =
+        `${cat.icon} ${cat.name}  ¥${formatMoney(record.amount)}`;
+      document.getElementById('delete-modal').classList.remove('hidden');
     }, 500);
   });
   list.addEventListener('pointermove', () => { clearTimeout(lpTimer); });
   list.addEventListener('pointerup', () => { clearTimeout(lpTimer); });
   list.addEventListener('pointercancel', () => { clearTimeout(lpTimer); });
 
-  // Delete button inside modal
-  document.getElementById('record-modal-delete').addEventListener('click', () => {
-    if (!editingRecordId) return;
+  // Delete confirm
+  function closeDelete() {
+    document.getElementById('delete-modal').classList.add('hidden');
+    deletingId = null;
+  }
+  document.getElementById('delete-confirm').addEventListener('click', () => {
+    if (!deletingId) return;
     const state = getState();
-    state.records = state.records.filter(r => r.id !== editingRecordId);
-    editingRecordId = null;
+    state.records = state.records.filter(r => r.id !== deletingId);
+    deletingId = null;
     saveState();
-    closeAmountModal();
+    closeDelete();
     renderRecords();
     renderBookSummary();
     showToast('已删除');
   });
+  document.getElementById('delete-cancel').addEventListener('click', closeDelete);
+  document.querySelector('#delete-modal .modal-overlay').addEventListener('click', closeDelete);
 
   // Numpad
   document.querySelectorAll('.numpad button').forEach(btn => {

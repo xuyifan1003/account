@@ -120,9 +120,18 @@
       <button data-key="1">1</button><button data-key="2">2</button><button data-key="3">3</button>
       <button data-key="0">0</button><button data-key=".">.</button>
     </div>
-    <div id="record-delete-row" style="display:none;margin-top:12px">
-      <button class="btn-danger" id="record-modal-delete">删除此记录</button>
-    </div>
+  </div>
+</div>
+
+<!-- ===== Delete Confirm Modal ===== -->
+<div id="delete-modal" class="modal hidden">
+  <div class="modal-overlay"></div>
+  <div class="modal-content modal-sm" style="text-align:center;padding:24px">
+    <div class="delete-icon">🗑</div>
+    <div class="delete-title">确认删除这条记录？</div>
+    <div class="delete-sub" id="delete-modal-text"></div>
+    <button class="btn-danger" id="delete-confirm">删除</button>
+    <button class="btn-ghost" id="delete-cancel">取消</button>
   </div>
 </div>
 
