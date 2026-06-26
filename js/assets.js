@@ -119,10 +119,21 @@ function toggleAssets() {
   renderAssets();
 }
 
+/* ===== Reset Visibility ===== */
+export function resetAssetsVisibility() {
+  assetsVisible = false;
+  renderAssets();
+}
+
 /* ===== Init ===== */
 export function initAssets() {
   renderAssets();
   document.querySelector('#page-assets .summary-card').addEventListener('click', toggleAssets);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && document.getElementById('page-assets').classList.contains('active')) {
+      resetAssetsVisibility();
+    }
+  });
 
   document.getElementById('asset-close').addEventListener('click', closeAssetModal);
   document.querySelector('#asset-modal .modal-overlay').addEventListener('click', closeAssetModal);
