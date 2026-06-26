@@ -309,7 +309,6 @@
   width: 100%;
   max-width: 28px;
   border-radius: 5px 5px 0 0;
-  flex: 1;
   transition: height 0.5s var(--ease-smooth), background 0.3s;
 }
 
