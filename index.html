@@ -7,8 +7,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#F0F2F6">
+<link rel="icon" type="image/png" sizes="192x192" href="icon.png">
 <link rel="manifest" href="manifest.json">
-<title>极简记账</title>
+<title>记账</title>
 <link rel="stylesheet" href="css/variables.css">
 <link rel="stylesheet" href="css/layout.css">
 <link rel="stylesheet" href="css/components.css">
@@ -19,7 +20,7 @@
 
   <!-- Header -->
   <header id="header">
-    <h1>极简记账</h1>
+    <h1>记账</h1>
   </header>
 
   <!-- ===== Tab 1: 记账 ===== -->
@@ -139,15 +140,21 @@
 <!-- ===== Asset Modal ===== -->
 <div id="asset-modal" class="modal hidden">
   <div class="modal-overlay"></div>
-  <div class="modal-content modal-sm">
+  <div class="modal-content">
     <div class="modal-header">
-      <span id="asset-modal-title">编辑资产</span>
+      <span id="asset-modal-title">🏦 微信零钱</span>
       <button class="modal-close" id="asset-close">✕</button>
     </div>
-    <div class="asset-form">
-      <div class="asset-name-display" id="asset-name-display"></div>
-      <input type="number" id="asset-balance" placeholder="余额" step="0.01">
-      <button class="btn-primary" id="asset-save">保存</button>
+    <div class="amount-display">
+      <span class="currency">¥</span>
+      <span id="asset-amount-value">0</span>
+    </div>
+    <div class="numpad">
+      <button data-asset-key="7">7</button><button data-asset-key="8">8</button><button data-asset-key="9">9</button><button class="key-del" data-asset-key="del">⌫</button>
+      <button class="key-confirm" data-asset-key="confirm">✓</button>
+      <button data-asset-key="4">4</button><button data-asset-key="5">5</button><button data-asset-key="6">6</button>
+      <button data-asset-key="1">1</button><button data-asset-key="2">2</button><button data-asset-key="3">3</button>
+      <button data-asset-key="0" style="grid-column:span 2">0</button><button data-asset-key=".">.</button>
     </div>
   </div>
 </div>

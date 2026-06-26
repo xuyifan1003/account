@@ -1,7 +1,8 @@
-const CACHE = 'money-book-v17';
+const CACHE = 'money-book-v18';
 const URLS = [
   'index.html',
   'manifest.json',
+  'icon.png',
   'css/variables.css',
   'css/layout.css',
   'css/components.css',
