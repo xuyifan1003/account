@@ -45,18 +45,32 @@
 
   <!-- ===== Tab 3: 报表 ===== -->
   <section id="page-report" class="page">
-    <div class="month-nav">
-      <button class="month-btn" id="prev-month">‹</button>
-      <span id="current-month"></span>
-      <button class="month-btn" id="next-month">›</button>
+    <div class="view-toggle">
+      <button class="vt-btn active" id="view-month">月支出</button>
+      <button class="vt-btn" id="view-year">年支出</button>
     </div>
-    <div class="report-cards">
-      <div class="r-card income"><div class="r-label">收入</div><div class="r-val" id="r-income">0.00</div></div>
-      <div class="r-card expense"><div class="r-label">支出</div><div class="r-val" id="r-expense">0.00</div></div>
+    <div class="report-nav">
+      <button class="nav-btn" id="prev-period">‹</button>
+      <span class="nav-label" id="current-period">2026年6月</span>
+      <button class="nav-btn" id="next-period">›</button>
     </div>
-    <div class="section-title">分类支出排行</div>
-    <div id="report-chart"></div>
-    <div class="empty-tip" id="report-empty">本月暂无记录</div>
+
+    <div class="summary-card">
+      <div class="summary-label" id="report-label">本月支出</div>
+      <div class="summary-amount" id="report-total">0.00</div>
+      <div class="summary-sub" id="report-sub"></div>
+    </div>
+
+    <div class="report-card">
+      <div class="section-title">分类占比</div>
+      <div id="report-categories"></div>
+      <div class="empty-tip" id="category-empty" style="display:none">暂无记录</div>
+    </div>
+
+    <div class="report-card">
+      <div class="section-title" id="trend-title">近12月趋势</div>
+      <div id="report-trend"></div>
+    </div>
   </section>
 
   <!-- ===== Bottom Tab Bar ===== -->
