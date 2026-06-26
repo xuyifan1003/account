@@ -2,7 +2,11 @@ import { renderReport } from './report.js';
 import { renderAssets } from './assets.js';
 import { haptic } from './utils.js';
 
+let currentTab = 'book';
+
 export function switchTab(tabName) {
+  if (tabName === currentTab) return;
+  currentTab = tabName;
   haptic();
   document.querySelectorAll('.tab').forEach(t =>
     t.classList.toggle('active', t.dataset.tab === tabName)

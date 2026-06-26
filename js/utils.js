@@ -16,7 +16,8 @@ export function getTodayMonth() {
 
 /* ===== Formatting ===== */
 export function formatMoney(n) {
-  return Number(n).toFixed(2);
+  const num = Number(n);
+  return isNaN(num) ? '0.00' : num.toFixed(2);
 }
 
 /* ===== ID Generator ===== */
@@ -48,6 +49,6 @@ export function haptic() {
 /* ===== Shake Animation ===== */
 export function shakeElement(el) {
   el.style.animation = 'none';
-  el.offsetHeight;
+  el.offsetHeight; // force reflow to restart animation
   el.style.animation = 'shake .3s ease';
 }

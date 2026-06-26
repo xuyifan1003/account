@@ -168,13 +168,25 @@ export function initBook() {
 
   // Long press on record items → delete
   let lpTimer = null;
+  let lpItem = null;
   const list = document.getElementById('records-list');
+
+  function clearLp() {
+    clearTimeout(lpTimer);
+    if (lpItem) { lpItem.classList.remove('pressing'); lpItem = null; }
+  }
+
   list.addEventListener('pointerdown', e => {
+    clearLp();
     const item = e.target.closest('.record-item');
     if (!item) return;
     const id = item.dataset.id;
     if (!id) return;
+    lpItem = item;
+    item.classList.add('pressing');
     lpTimer = setTimeout(() => {
+      item.classList.remove('pressing');
+      lpItem = null;
       haptic();
       const record = getState().records.find(r => r.id === id);
       if (!record) return;
@@ -185,9 +197,10 @@ export function initBook() {
       document.getElementById('delete-modal').classList.remove('hidden');
     }, 500);
   });
-  list.addEventListener('pointermove', () => { clearTimeout(lpTimer); });
-  list.addEventListener('pointerup', () => { clearTimeout(lpTimer); });
-  list.addEventListener('pointercancel', () => { clearTimeout(lpTimer); });
+  list.addEventListener('pointermove', clearLp);
+  list.addEventListener('pointerup', clearLp);
+  list.addEventListener('pointercancel', clearLp);
+  list.addEventListener('pointerleave', clearLp);
 
   // Delete confirm
   function closeDelete() {
@@ -218,8 +231,5 @@ export function initBook() {
   document.querySelector('#amount-modal .modal-overlay').addEventListener('click', closeAmountModal);
 
   // Auto-refresh records every minute
-  setInterval(() => {
-    renderRecords();
-    renderBookSummary();
-  }, 60000);
+  setInterval(() => { renderRecords(); renderBookSummary(); }, 60000);
 }

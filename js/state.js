@@ -1,4 +1,5 @@
 import { api } from './db.js';
+import { showToast } from './utils.js';
 
 /* ===== Categories & Default Assets ===== */
 export const CATEGORIES = [
@@ -65,8 +66,14 @@ export function getState() {
 }
 
 export function saveState() {
-  api('POST', 'records', state.records, 'on_conflict=id').catch(e => console.warn('save records:', e));
-  api('POST', 'assets', state.assets.map(mapAssetToDb), 'on_conflict=id').catch(e => console.warn('save assets:', e));
+  let failed = false;
+  const warn = (label, e) => { console.warn(label, e); failed = true; };
+  Promise.all([
+    api('POST', 'records', state.records, 'on_conflict=id').catch(e => warn('save records:', e)),
+    api('POST', 'assets', state.assets.map(mapAssetToDb), 'on_conflict=id').catch(e => warn('save assets:', e)),
+  ]).then(() => {
+    if (failed) showToast('同步失败，请检查网络');
+  }).catch(() => {});
 }
 
 /* ===== Category Lookup ===== */

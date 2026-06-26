@@ -46,7 +46,11 @@ export function renderReport() {
 }
 
 function matchPeriod(dateStr) {
-  const [y, m] = dateStr.split('-').map(Number);
+  if (!dateStr) return false;
+  const parts = dateStr.split('-');
+  if (parts.length < 2) return false;
+  const [y, m] = parts.map(Number);
+  if (isNaN(y) || isNaN(m)) return false;
   if (viewMode === 'month') {
     const [ry, rm] = reportDate.split('-').map(Number);
     return y === ry && m === rm;
@@ -146,7 +150,7 @@ function buildMonthTrend(state) {
       .reduce((s, r) => s + r.amount, 0);
     data.push({
       period,
-      label: (d.getMonth() + 1) + '月',
+      label: (d.getMonth() === 0 ? `${d.getFullYear()}` + '年' : '') + (d.getMonth() + 1) + '月',
       amount: expense,
       targetMode: 'month',
     });
@@ -250,6 +254,7 @@ export function initReport() {
   document.getElementById('view-month').addEventListener('click', () => switchView('month'));
   document.getElementById('view-year').addEventListener('click', () => switchView('year'));
   document.getElementById('current-period').addEventListener('click', () => {
+    haptic();
     reportDate = viewMode === 'month' ? getTodayMonth() : String(new Date().getFullYear());
     renderReport();
   });

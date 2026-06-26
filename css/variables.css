@@ -55,5 +55,7 @@ body {
   user-select: none;
 }
 
+.summary-amount, .record-amount, .report-cat-amount, .amount-display { user-select: text; }
+
 /* ===== Utility ===== */
 .hidden { display: none !important; }

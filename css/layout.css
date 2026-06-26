@@ -127,6 +127,6 @@
 
 /* ===== Safe Area ===== */
 @supports(padding-bottom:env(safe-area-inset-bottom)){
-  .page { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
-  #tab-bar { padding-bottom: env(safe-area-inset-bottom); }
+  .page { padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px)); }
+  #tab-bar { padding-bottom: env(safe-area-inset-bottom, 0px); }
 }

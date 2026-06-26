@@ -1,4 +1,4 @@
-const CACHE = 'money-book-v13';
+const CACHE = 'money-book-v14';
 const URLS = [
   'index.html',
   'manifest.json',
@@ -25,6 +25,7 @@ self.addEventListener('install', e => {
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      .then(() => self.clients.claim())
   );
 });
 
