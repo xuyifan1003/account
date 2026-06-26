@@ -1,5 +1,5 @@
 import { CATEGORIES, getState, saveState, getCategory } from './state.js';
-import { getToday, getNow, formatMoney, genId, showToast, shakeElement } from './utils.js';
+import { getToday, getNow, formatMoney, genId, showToast, shakeElement, haptic } from './utils.js';
 
 /* ===== Modal State ===== */
 let selectedCategory = null;
@@ -33,6 +33,7 @@ export function renderCategories() {
   grid.addEventListener('click', e => {
     const btn = e.target.closest('.cat-btn');
     if (!btn) return;
+    haptic();
     selectedCategory = btn.dataset.cat;
     openAmountModal(selectedCategory);
   });
@@ -53,7 +54,7 @@ export function renderRecords() {
     const isExpense = r.type === 'expense';
     return `
       <div class="record-item" style="animation-delay:${i * 0.03}s">
-        <div class="record-icon-wrap ${r.type}">${cat.icon}</div>
+        <div class="record-icon-wrap ${r.category}">${cat.icon}</div>
         <div class="record-info">
           <div class="record-cat">${cat.name}</div>
           ${r.note ? `<div class="record-note">${r.note}</div>` : ''}
@@ -87,6 +88,7 @@ function closeAmountModal() {
 /* ===== Numpad ===== */
 function handleNumpad(key) {
   if (key === 'confirm') {
+    haptic();
     const val = parseFloat(modalAmount);
     if (val <= 0) {
       shakeElement(document.querySelector('.amount-display'));

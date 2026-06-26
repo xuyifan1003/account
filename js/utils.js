@@ -38,6 +38,13 @@ export function showToast(msg) {
   el._timer = setTimeout(() => el.classList.remove('show'), 2000);
 }
 
+/* ===== Haptic Feedback ===== */
+export function haptic() {
+  if (navigator.vibrate) {
+    navigator.vibrate(8);
+  }
+}
+
 /* ===== Shake Animation ===== */
 export function shakeElement(el) {
   el.style.animation = 'none';

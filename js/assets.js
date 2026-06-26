@@ -1,5 +1,5 @@
 import { getState, saveState } from './state.js';
-import { formatMoney, showToast } from './utils.js';
+import { formatMoney, showToast, haptic } from './utils.js';
 
 let editingAssetId = null;
 
@@ -22,7 +22,7 @@ export function renderAssets() {
   `).join('');
 
   container.querySelectorAll('.asset-item').forEach(el => {
-    el.addEventListener('click', () => openAssetModal(el.dataset.id));
+    el.addEventListener('click', () => { haptic(); openAssetModal(el.dataset.id); });
   });
 }
 
@@ -42,6 +42,7 @@ function closeAssetModal() {
 }
 
 function saveAsset() {
+  haptic();
   const balance = parseFloat(document.getElementById('asset-balance').value) || 0;
   const state = getState();
   const asset = state.assets.find(a => a.id === editingAssetId);

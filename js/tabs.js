@@ -1,7 +1,9 @@
 import { renderReport } from './report.js';
 import { renderAssets } from './assets.js';
+import { haptic } from './utils.js';
 
 export function switchTab(tabName) {
+  haptic();
   document.querySelectorAll('.tab').forEach(t =>
     t.classList.toggle('active', t.dataset.tab === tabName)
   );

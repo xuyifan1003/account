@@ -1,4 +1,4 @@
-import { getDb } from './db.js';
+import { api } from './db.js';
 
 /* ===== Categories & Default Assets ===== */
 export const CATEGORIES = [
@@ -38,27 +38,23 @@ function mapAssetToDb(a) {
 
 export async function initState() {
   try {
-    const db = await getDb();
-    const [recordsRes, assetsRes] = await Promise.all([
-      db.from('records').select('*').order('date', { ascending: false }).order('time', { ascending: false }),
-      db.from('assets').select('*').order('sort', { ascending: true }),
+    const [records, assetsData] = await Promise.all([
+      api('GET', 'records', null, 'order=date.desc&order=time.desc'),
+      api('GET', 'assets', null, 'order=sort.asc'),
     ]);
 
-    if (!recordsRes.error && !assetsRes.error) {
-      const records = recordsRes.data || [];
-      const assets = (assetsRes.data || []).map(mapAssetFromDb);
+    const assets = assetsData.map(mapAssetFromDb);
 
-      if (assets.length === 0) {
-        state = { records, assets: JSON.parse(JSON.stringify(DEFAULT_ASSETS)) };
-        db.from('assets').upsert(state.assets.map(mapAssetToDb), { onConflict: 'id' }).catch(() => {});
-      } else {
-        state = { records, assets };
-      }
-      return;
+    if (assets.length === 0) {
+      state = { records, assets: JSON.parse(JSON.stringify(DEFAULT_ASSETS)) };
+      api('POST', 'assets', state.assets.map(mapAssetToDb), 'on_conflict=id').catch(() => {});
+    } else {
+      state = { records, assets };
     }
-  } catch(e) {}
-
-  state = { records: [], assets: JSON.parse(JSON.stringify(DEFAULT_ASSETS)) };
+  } catch(e) {
+    console.warn('Supabase read failed:', e);
+    state = { records: [], assets: JSON.parse(JSON.stringify(DEFAULT_ASSETS)) };
+  }
 }
 
 export function getState() {
@@ -69,10 +65,8 @@ export function getState() {
 }
 
 export function saveState() {
-  getDb().then(db => {
-    db.from('records').upsert(state.records, { onConflict: 'id' }).catch(() => {});
-    db.from('assets').upsert(state.assets.map(mapAssetToDb), { onConflict: 'id' }).catch(() => {});
-  }).catch(() => {});
+  api('POST', 'records', state.records, 'on_conflict=id').catch(e => console.warn('save records:', e));
+  api('POST', 'assets', state.assets.map(mapAssetToDb), 'on_conflict=id').catch(e => console.warn('save assets:', e));
 }
 
 /* ===== Category Lookup ===== */

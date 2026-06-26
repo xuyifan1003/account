@@ -1,5 +1,5 @@
 import { getState, getCategory } from './state.js';
-import { getTodayMonth, formatMoney } from './utils.js';
+import { getTodayMonth, formatMoney, haptic } from './utils.js';
 
 let viewMode = 'month';
 let reportDate = getTodayMonth();
@@ -104,6 +104,7 @@ function renderTrend(state) {
 
   el.querySelectorAll('.trend-col').forEach(col => {
     col.addEventListener('click', () => {
+      haptic();
       const period = col.dataset.period;
       const mode = col.dataset.mode;
       if (period) {
@@ -185,6 +186,7 @@ function barColor(amount, max) {
 }
 
 function prevPeriod() {
+  haptic();
   if (viewMode === 'month') {
     const [y, m] = reportDate.split('-').map(Number);
     const d = new Date(y, m - 2, 1);
@@ -196,6 +198,7 @@ function prevPeriod() {
 }
 
 function nextPeriod() {
+  haptic();
   if (viewMode === 'month') {
     const [y, m] = reportDate.split('-').map(Number);
     const d = new Date(y, m, 1);
@@ -214,6 +217,7 @@ function updateToggleButtons() {
 
 function switchView(mode) {
   if (viewMode === mode) return;
+  haptic();
   viewMode = mode;
   if (mode === 'year') {
     reportDate = reportDate.split('-')[0];

@@ -1,4 +1,4 @@
-const CACHE = 'money-book-v5';
+const CACHE = 'money-book-v7';
 const URLS = [
   'index.html',
   'manifest.json',

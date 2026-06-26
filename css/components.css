@@ -45,20 +45,9 @@
   position: relative;
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
-.cat-icon-wrap.food { background: linear-gradient(135deg, #FFE4E6, #FECDD3); }
-.cat-icon-wrap.daily { background: linear-gradient(135deg, #DBEAFE, #BFDBFE); }
-.cat-icon-wrap.transport { background: linear-gradient(135deg, #E0E7FF, #C7D2FE); }
-.cat-icon-wrap.clothing { background: linear-gradient(135deg, #FCE7F3, #FBCFE8); }
-.cat-icon-wrap.entertainment { background: linear-gradient(135deg, #EDE9FE, #DDD6FE); }
-.cat-icon-wrap.communication { background: linear-gradient(135deg, #E0F2FE, #BAE6FD); }
-.cat-icon-wrap.digital { background: linear-gradient(135deg, #F1F5F9, #CBD5E1); }
-.cat-icon-wrap.medical { background: linear-gradient(135deg, #FEE2E2, #FECACA); }
-.cat-icon-wrap.housing { background: linear-gradient(135deg, #FEF3C7, #FDE68A); }
-.cat-icon-wrap.study { background: linear-gradient(135deg, #D1FAE5, #A7F3D0); }
-.cat-icon-wrap.social { background: linear-gradient(135deg, #FFEDD5, #FED7AA); }
 
 .cat-btn .cat-name {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--text-secondary);
 }
@@ -100,11 +89,21 @@
   flex-shrink: 0;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
-.record-icon-wrap.expense { background: linear-gradient(135deg, #FEE2E2, #FECACA); }
-.record-icon-wrap.income { background: linear-gradient(135deg, #D1FAE5, #A7F3D0); }
+/* Shared category colors for cat-icon-wrap, record-icon-wrap, report-cat-icon */
+.cat-icon-wrap.food, .record-icon-wrap.food, .report-cat-icon.food { background: linear-gradient(135deg, #FFE4E6, #FECDD3); }
+.cat-icon-wrap.daily, .record-icon-wrap.daily, .report-cat-icon.daily { background: linear-gradient(135deg, #DBEAFE, #BFDBFE); }
+.cat-icon-wrap.transport, .record-icon-wrap.transport, .report-cat-icon.transport { background: linear-gradient(135deg, #E0E7FF, #C7D2FE); }
+.cat-icon-wrap.clothing, .record-icon-wrap.clothing, .report-cat-icon.clothing { background: linear-gradient(135deg, #FCE7F3, #FBCFE8); }
+.cat-icon-wrap.entertainment, .record-icon-wrap.entertainment, .report-cat-icon.entertainment { background: linear-gradient(135deg, #EDE9FE, #DDD6FE); }
+.cat-icon-wrap.communication, .record-icon-wrap.communication, .report-cat-icon.communication { background: linear-gradient(135deg, #E0F2FE, #BAE6FD); }
+.cat-icon-wrap.digital, .record-icon-wrap.digital, .report-cat-icon.digital { background: linear-gradient(135deg, #F1F5F9, #CBD5E1); }
+.cat-icon-wrap.medical, .record-icon-wrap.medical, .report-cat-icon.medical { background: linear-gradient(135deg, #FEE2E2, #FECACA); }
+.cat-icon-wrap.housing, .record-icon-wrap.housing, .report-cat-icon.housing { background: linear-gradient(135deg, #FEF3C7, #FDE68A); }
+.cat-icon-wrap.study, .record-icon-wrap.study, .report-cat-icon.study { background: linear-gradient(135deg, #D1FAE5, #A7F3D0); }
+.cat-icon-wrap.social, .record-icon-wrap.social, .report-cat-icon.social { background: linear-gradient(135deg, #FFEDD5, #FED7AA); }
 
 .record-info { flex: 1; min-width: 0; }
-.record-cat { font-weight: 600; font-size: 14px; color: var(--text); }
+.record-cat { font-weight: 600; font-size: 15px; color: var(--text); }
 .record-note {
   font-size: 12px;
   color: var(--text-tertiary);
@@ -217,13 +216,13 @@
 .amount-display {
   text-align: center;
   padding: 4px 0 16px;
-  font-size: 48px;
+  font-size: 36px;
   font-weight: 800;
   letter-spacing: -1.5px;
   color: var(--text);
 }
 .amount-display .currency {
-  font-size: 28px;
+  font-size: 22px;
   color: var(--text-tertiary);
   margin-right: 2px;
   font-weight: 600;
@@ -255,7 +254,7 @@
   padding: 16px 0;
   border: none;
   border-radius: var(--radius-sm);
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 600;
   background: var(--bg);
   cursor: pointer;
@@ -273,7 +272,7 @@
   grid-column: 4;
   background: var(--primary-gradient);
   color: #fff;
-  font-size: 26px;
+  font-size: 22px;
   font-weight: 700;
   box-shadow: 0 4px 12px rgba(108, 99, 255, 0.35);
 }
