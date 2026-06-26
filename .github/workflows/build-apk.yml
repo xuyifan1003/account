@@ -36,7 +36,7 @@ jobs:
 
       - name: Init TWA project
         run: |
-          printf 'Y\n' | bubblewrap init \
+          yes '' | bubblewrap init \
             --manifest=https://xuyifan1003.github.io/account/manifest.json \
             --signingKeyPath=release-key.jks \
             --signingKeyAlias=key0 \
