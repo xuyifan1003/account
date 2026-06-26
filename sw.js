@@ -1,4 +1,4 @@
-const CACHE = 'money-book-v16';
+const CACHE = 'money-book-v17';
 const URLS = [
   'index.html',
   'manifest.json',
@@ -33,10 +33,11 @@ self.addEventListener('fetch', e => {
   const { request: r } = e;
   if (r.method !== 'GET') return;
   e.respondWith(
-    fetch(r).then(res => {
-      const clone = res.clone();
-      caches.open(CACHE).then(c => c.put(r, clone));
-      return res;
-    }).catch(() => caches.match(r).then(cached => cached || caches.match('index.html')))
+    caches.match(r).then(cached => {
+      const fetchPromise = fetch(r).then(res =>
+        caches.open(CACHE).then(c => { c.put(r, res.clone()); return res; })
+      ).catch(() => cached);
+      return cached || fetchPromise;
+    })
   );
 });
