@@ -36,13 +36,20 @@ jobs:
 
       - name: Init TWA project
         run: |
-          bubblewrap init \
+          printf 'Y\n' | bubblewrap init \
             --manifest=https://xuyifan1003.github.io/account/manifest.json \
             --signingKeyPath=release-key.jks \
             --signingKeyAlias=key0 \
             --signingKeyPassword=android \
             --storePassword=android \
             --skipPwaValidation
+
+      - name: Enable edge-to-edge (remove status bar line)
+        run: |
+          styles=app/src/main/res/values/styles.xml
+          [ -f "$styles" ] || exit 0
+          sed -i 's|android:statusBarColor">[^<]*</item>|android:statusBarColor">@android:color/transparent</item>|' "$styles"
+          sed -i 's|android:navigationBarColor">[^<]*</item>|android:navigationBarColor">@android:color/transparent</item>|' "$styles"
 
       - name: Build APK
         run: bubblewrap build
