@@ -7,35 +7,42 @@ Vanilla JS PWA (no build, no npm, no backend). Single-page personal finance trac
 ```
 npx serve .
 ```
-Or open `index.html` directly (requires internet for initial Supabase sync).
 
 ## Init order (js/app.js)
 ```
-DOMContentLoaded → await initState (Supabase then localStorage fallback) → initTabs → initBook → initAssets → initReport → renderBookSummary → register SW
+DOMContentLoaded → await initState → initTabs → initBook → initAssets → initReport → renderBookSummary → register SW
 ```
 
 ## Data flow
-- **DB**: Supabase PostgreSQL. Client loaded dynamically from CDN in `js/db.js`. Tables: `records`, `assets`
-- **Read**: `initState()` fetches Supabase
-- **Write**: `saveState()` fire-and-forget upsert to Supabase
-- **RLS**: permissive — all `ANON` key operations allowed on both tables
+- **DB**: Supabase PostgreSQL via direct fetch() REST calls in `js/db.js`. No SDK, no CDN. Tables: `records`, `assets`
+- **Read**: `initState()` → `api('GET', ...)` from Supabase, fail → empty defaults
+- **Write**: `saveState()` → `api('POST', ...)` upsert all records + assets with `on_conflict=id`. Errors → console.warn
+- **Delete**: MUST explicitly call `api('DELETE', 'records', null, 'id=eq.xxx')`. Upsert alone won't remove rows
+- **RLS**: permissive — `ALL` operations allowed with `ANON` key
 
 ## Key conventions
-- **State**: in-memory only, shape `{ records: [...], assets: [...] }`. Synced to Supabase on write
-- **Records** are prepended (`unshift`), chronological is reverse. No income categories exist — all 11 built-in categories are `type: 'expense'`
-- **IDs** via `Date.now().toString(36) + Math.random().toString(36).slice(2, 5)` in `genId()`
-- **Amounts**: stored as raw numbers, displayed with `.toFixed(2)`. Numpad: max 10 integer digits, max 2 decimal places. Zero/negative triggers shake animation
-- **Assets** rendered sorted by balance descending (not by `sort` field). Default asset IDs follow `asset-*` pattern
-- **Today's records** auto-refresh every 60s via `setInterval` in `book.js`
-- **Tab switching** in `tabs.js`: report and assets re-render on each switch; book does not
+- **State**: in-memory only, shape `{ records: [...], assets: [...] }`. No localStorage
+- **Records** prepended (`unshift`). All 11 built-in categories are `type: 'expense'` — no income exists
+- **IDs**: `Date.now().toString(36) + Math.random().toString(36).slice(2, 5)`
+- **Amounts**: raw numbers, display with `.toFixed(2)`. Numpad: ≤10 integer digits, ≤2 decimals. Zero/negative → shake
+- **Assets**: sorted by balance desc (not sort field). Default IDs pattern `asset-*`
+- **Today's records**: auto-refresh every 60s via `setInterval` in `book.js`
+- **Tab switching**: report and assets re-render per switch; book does not. Same-tab repeat clicks skipped (`currentTab` guard in `tabs.js`)
+- **Record icons**: use `r.category` class for colored backgrounds (not `r.type`)
+- **Haptic**: call `haptic()` from `utils.js` on all interactive elements (taps, toggles, confirms)
+
+## Layout: scrolling only where needed
+- **Book page**: `.book-sticky` (card + categories) fixed top, `.book-scroll` (records list only) fills rest and scrolls
+- **Report page**: `.report-top` fixed, `.report-scroll` (categories) fills middle and scrolls, `.report-trend-fixed` sticks to bottom (hidden in month view)
 
 ## CSS
-- All tokens via CSS custom properties in `variables.css`
+- All tokens via CSS custom properties in `variables.css`. `--primary` is `#8B83FF` — keep hardcoded colors in sync with this
 - Mobile-first, max-width 500px, safe-area-inset
 
 ## SW cache (network-first)
-- Cache name `money-book-v15` in `sw.js:1` — **每次部署必须 bump**（如 `v14` → `v15`），否则浏览器永不到新内容
-- PRECACHE list in `sw.js` must match actual project files
+- Cache name `money-book-v15` in `sw.js:1` — **每次部署必须 bump**（如 `v15` → `v16`）
+- PRECACHE list in `sw.js` must match actual files
+- `clients.claim()` on activate → new SW takes over immediately
 
 ## No CI, tests, lint, typecheck, formatter, or package.json
 
