@@ -33,8 +33,8 @@ DOMContentLoaded → await initState (Supabase then localStorage fallback) → i
 - All tokens via CSS custom properties in `variables.css`
 - Mobile-first, max-width 500px, safe-area-inset
 
-## SW cache (cache-first)
-- Cache name `money-book-v12` in `sw.js:1` — **每次部署必须 bump**（如 `v12` → `v13`），否则浏览器永不到新内容
+## SW cache (network-first)
+- Cache name `money-book-v13` in `sw.js:1` — **每次部署必须 bump**（如 `v13` → `v14`），否则浏览器永不到新内容
 - PRECACHE list in `sw.js` must match actual project files
 
 ## No CI, tests, lint, typecheck, formatter, or package.json
