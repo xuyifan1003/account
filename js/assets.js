@@ -2,6 +2,7 @@ import { getState, saveState } from './state.js';
 import { formatMoney, showToast, shakeElement, haptic } from './utils.js';
 
 let editingAssetId = null;
+let assetsVisible = false;
 let assetModalAmount = '0';
 let assetModalHasDecimal = false;
 let assetModalDecimalDigits = 0;
@@ -12,7 +13,7 @@ export function renderAssets() {
   const state = getState();
   const sorted = [...state.assets].sort((a, b) => (Number(b.balance) || 0) - (Number(a.balance) || 0));
   const total = sorted.reduce((s, a) => s + (Number(a.balance) || 0), 0);
-  document.getElementById('total-assets').textContent = formatMoney(total);
+  document.getElementById('total-assets').textContent = assetsVisible ? formatMoney(total) : '****';
 
   container.innerHTML = sorted.map(a => `
     <div class="asset-item" data-id="${a.id}">
@@ -20,7 +21,7 @@ export function renderAssets() {
       <div class="asset-info">
         <div class="asset-name">${a.name}</div>
       </div>
-      <div class="asset-balance">¥${formatMoney(a.balance)}</div>
+      <div class="asset-balance">${assetsVisible ? '¥' + formatMoney(a.balance) : '****'}</div>
     </div>
   `).join('');
 
@@ -111,9 +112,17 @@ function handleAssetNumpad(key) {
   updateAssetDisplay();
 }
 
+/* ===== Toggle Visibility ===== */
+function toggleAssets() {
+  haptic();
+  assetsVisible = !assetsVisible;
+  renderAssets();
+}
+
 /* ===== Init ===== */
 export function initAssets() {
   renderAssets();
+  document.querySelector('#page-assets .summary-card').addEventListener('click', toggleAssets);
 
   document.getElementById('asset-close').addEventListener('click', closeAssetModal);
   document.querySelector('#asset-modal .modal-overlay').addEventListener('click', closeAssetModal);
