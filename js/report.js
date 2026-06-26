@@ -20,6 +20,7 @@ export function renderReport() {
     document.getElementById('report-categories').innerHTML = '';
     document.getElementById('category-empty').style.display = 'block';
     document.getElementById('report-trend').innerHTML = '';
+    document.getElementById('trend-section').style.display = 'none';
     return;
   }
 
@@ -36,7 +37,12 @@ export function renderReport() {
   }
 
   renderCategories(expenseRecords, totalExpense);
-  renderTrend(state);
+  if (viewMode === 'year') {
+    document.getElementById('trend-section').style.display = 'block';
+    renderTrend(state);
+  } else {
+    document.getElementById('trend-section').style.display = 'none';
+  }
 }
 
 function matchPeriod(dateStr) {
@@ -212,7 +218,14 @@ function nextPeriod() {
 function updateToggleButtons() {
   document.getElementById('view-month').classList.toggle('active', viewMode === 'month');
   document.getElementById('view-year').classList.toggle('active', viewMode === 'year');
-  document.getElementById('trend-title').textContent = viewMode === 'year' ? '各月支出' : '近12月趋势';
+  if (viewMode === 'year') {
+    document.getElementById('trend-section').style.display = 'block';
+    document.getElementById('trend-title').style.display = 'none';
+  } else {
+    document.getElementById('trend-section').style.display = 'none';
+    document.getElementById('trend-title').style.display = 'block';
+    document.getElementById('trend-title').textContent = '近12月趋势';
+  }
 }
 
 function switchView(mode) {

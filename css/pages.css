@@ -104,8 +104,8 @@
 .view-toggle .vt-btn {
   background: var(--card);
   border: 1px solid var(--border);
-  padding: 6px 20px;
-  font-size: 13px;
+  padding: 8px 24px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   color: var(--text-secondary);
@@ -168,13 +168,23 @@
   background: var(--card);
   border-radius: var(--radius);
   padding: 16px;
-  margin-bottom: 16px;
   box-shadow: var(--card-shadow);
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 /* ===== Category Chart ===== */
-#report-categories { display: flex; flex-direction: column; gap: 12px; }
+#report-categories {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-bottom: 4px;
+}
 
 #category-empty {
   flex: 1;
