@@ -401,3 +401,19 @@
   transition: background 0.15s;
 }
 .btn-ghost:active { background: var(--border); }
+
+/* ===== Chart ===== */
+.chart-section {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--card-shadow);
+  padding: 16px;
+  margin-top: 16px;
+}
+.chart-section .section-title { margin-bottom: 8px; }
+#asset-trend-chart {
+  display: block;
+  width: 100%;
+  height: 180px;
+  border-radius: var(--radius-xs);
+}

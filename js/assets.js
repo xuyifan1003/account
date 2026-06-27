@@ -1,5 +1,6 @@
-import { getState, saveState } from './state.js';
+import { getState, saveState, saveSnapshot } from './state.js';
 import { formatMoney, showToast, shakeElement, haptic } from './utils.js';
+import { renderAssetChart } from './chart.js';
 
 let editingAssetId = null;
 let assetsVisible = false;
@@ -28,6 +29,7 @@ export function renderAssets() {
   container.querySelectorAll('.asset-item').forEach(el => {
     el.addEventListener('click', () => { haptic(); openAssetModal(el.dataset.id); });
   });
+  renderAssetChart();
 }
 
 /* ===== Asset Modal ===== */
@@ -64,6 +66,7 @@ function handleAssetNumpad(key) {
     if (!asset) return;
     asset.balance = val;
     saveState();
+    saveSnapshot();
     closeAssetModal();
     renderAssets();
     showToast(`✓ ${asset.name} ¥${formatMoney(val)}`);

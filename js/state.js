@@ -1,5 +1,5 @@
 import { api } from './db.js';
-import { showToast } from './utils.js';
+import { showToast, getToday } from './utils.js';
 
 /* ===== Categories & Default Assets ===== */
 export const CATEGORIES = [
@@ -39,28 +39,30 @@ function mapAssetToDb(a) {
 
 export async function initState() {
   try {
-    const [records, assetsData] = await Promise.all([
+    const [records, assetsData, snapshots] = await Promise.all([
       api('GET', 'records', null, 'order=date.desc&order=time.desc'),
       api('GET', 'assets', null, 'order=sort.asc'),
+      api('GET', 'asset_snapshots', null, 'order=date.asc').catch(() => []),
     ]);
 
     const assets = assetsData.map(mapAssetFromDb);
+    const snap = snapshots.map(s => ({ id: s.id, total_balance: s.total_balance, date: s.date }));
 
     if (assets.length === 0) {
-      state = { records, assets: JSON.parse(JSON.stringify(DEFAULT_ASSETS)) };
+      state = { records, assets: JSON.parse(JSON.stringify(DEFAULT_ASSETS)), snapshots: snap };
       api('POST', 'assets', state.assets.map(mapAssetToDb), 'on_conflict=id').catch(() => {});
     } else {
-      state = { records, assets };
+      state = { records, assets, snapshots: snap };
     }
   } catch(e) {
     console.warn('Supabase read failed:', e);
-    state = { records: [], assets: JSON.parse(JSON.stringify(DEFAULT_ASSETS)) };
+    state = { records: [], assets: JSON.parse(JSON.stringify(DEFAULT_ASSETS)), snapshots: [] };
   }
 }
 
 export function getState() {
   if (!state) {
-    state = { records: [], assets: JSON.parse(JSON.stringify(DEFAULT_ASSETS)) };
+    state = { records: [], assets: JSON.parse(JSON.stringify(DEFAULT_ASSETS)), snapshots: [] };
   }
   return state;
 }
@@ -81,6 +83,21 @@ export function saveState() {
   ]).then(() => {
     if (failed) showToast('同步失败，请检查网络');
   }).catch(() => {});
+}
+
+export function saveSnapshot() {
+  const today = getToday();
+  const total = state.assets.reduce((s, a) => s + (Number(a.balance) || 0), 0);
+  const snap = { id: today, total_balance: total, date: today };
+
+  const i = state.snapshots.findIndex(s => s.id === today);
+  if (i >= 0) {
+    state.snapshots[i] = snap;
+  } else {
+    state.snapshots.push(snap);
+  }
+
+  api('POST', 'asset_snapshots', snap, 'on_conflict=id').catch(e => console.warn('save snapshot:', e));
 }
 
 /* ===== Category Lookup ===== */
