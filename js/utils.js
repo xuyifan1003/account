@@ -42,7 +42,7 @@ export function showToast(msg) {
 /* ===== Haptic Feedback ===== */
 export function haptic() {
   if (navigator.vibrate) {
-    navigator.vibrate(8);
+    navigator.vibrate(20);
   }
 }
 

@@ -87,8 +87,8 @@ function closeAmountModal() {
 
 /* ===== Numpad ===== */
 function handleNumpad(key) {
+  haptic();
   if (key === 'confirm') {
-    haptic();
     const val = parseFloat(modalAmount);
     if (val <= 0) {
       shakeElement(document.querySelector('.amount-display'));
@@ -226,7 +226,20 @@ export function initBook() {
 
   // Numpad
   document.querySelectorAll('.numpad button').forEach(btn => {
-    btn.addEventListener('click', () => handleNumpad(btn.dataset.key));
+    if (btn.dataset.key === 'del') {
+      let repeatTimer = null;
+      const stop = () => clearInterval(repeatTimer);
+      btn.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        handleNumpad('del');
+        repeatTimer = setInterval(() => handleNumpad('del'), 120);
+      });
+      btn.addEventListener('pointerup', stop);
+      btn.addEventListener('pointerleave', stop);
+      btn.addEventListener('pointercancel', stop);
+    } else {
+      btn.addEventListener('click', () => handleNumpad(btn.dataset.key));
+    }
   });
 
   // Modal close

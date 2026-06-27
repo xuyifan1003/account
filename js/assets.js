@@ -52,8 +52,8 @@ function updateAssetDisplay() {
 }
 
 function handleAssetNumpad(key) {
+  haptic();
   if (key === 'confirm') {
-    haptic();
     const val = parseFloat(assetModalAmount);
     if (val <= 0) {
       shakeElement(document.querySelector('#asset-modal .amount-display'));
@@ -138,6 +138,19 @@ export function initAssets() {
   document.getElementById('asset-close').addEventListener('click', closeAssetModal);
   document.querySelector('#asset-modal .modal-overlay').addEventListener('click', closeAssetModal);
   document.querySelectorAll('#asset-modal .numpad button').forEach(btn => {
-    btn.addEventListener('click', () => handleAssetNumpad(btn.dataset.assetKey));
+    if (btn.dataset.assetKey === 'del') {
+      let repeatTimer = null;
+      const stop = () => clearInterval(repeatTimer);
+      btn.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        handleAssetNumpad('del');
+        repeatTimer = setInterval(() => handleAssetNumpad('del'), 120);
+      });
+      btn.addEventListener('pointerup', stop);
+      btn.addEventListener('pointerleave', stop);
+      btn.addEventListener('pointercancel', stop);
+    } else {
+      btn.addEventListener('click', () => handleAssetNumpad(btn.dataset.assetKey));
+    }
   });
 }
