@@ -65,11 +65,18 @@ export function getState() {
   return state;
 }
 
+function normalizeRecord(r) {
+  return {
+    id: r.id, category: r.category, amount: r.amount,
+    note: r.note || '', date: r.date, time: r.time || '', type: r.type,
+  };
+}
+
 export function saveState() {
   let failed = false;
   const warn = (label, e) => { console.warn(label, e); failed = true; };
   Promise.all([
-    api('POST', 'records', state.records, 'on_conflict=id').catch(e => warn('save records:', e)),
+    api('POST', 'records', state.records.map(normalizeRecord), 'on_conflict=id').catch(e => warn('save records:', e)),
     api('POST', 'assets', state.assets.map(mapAssetToDb), 'on_conflict=id').catch(e => warn('save assets:', e)),
   ]).then(() => {
     if (failed) showToast('同步失败，请检查网络');
