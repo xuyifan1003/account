@@ -44,14 +44,16 @@ export function renderCategories() {
 /* ===== Records List ===== */
 export function renderRecords() {
   const container = document.getElementById('records-list');
-  const todayRecords = getState().records.filter(r => r.date === getToday());
+  const now = new Date();
+  const monthPrefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  const monthRecords = getState().records.filter(r => r.date.startsWith(monthPrefix));
 
-  if (todayRecords.length === 0) {
-    container.innerHTML = '<div class="empty-tip">今天还没有记录<br>点击上方分类开始记账</div>';
+  if (monthRecords.length === 0) {
+    container.innerHTML = '<div class="empty-tip">当月还没有记录<br>点击上方分类开始记账</div>';
     return;
   }
 
-  container.innerHTML = todayRecords.map((r, i) => {
+  container.innerHTML = monthRecords.map((r, i) => {
     const cat = getCategory(r.category);
     return `
       <div class="record-item" data-id="${r.id}" style="animation-delay:${i * 0.03}s">
@@ -62,7 +64,7 @@ export function renderRecords() {
         </div>
         <div class="record-right">
           <div class="record-amount">¥${formatMoney(r.amount)}</div>
-          <div class="record-time">${r.time}</div>
+          <div class="record-time">${r.date.slice(5)} ${r.time}</div>
         </div>
       </div>
     `;
