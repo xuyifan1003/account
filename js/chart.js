@@ -12,7 +12,9 @@ export function renderAssetChart() {
   container.style.display = 'block';
 
   const dpr = window.devicePixelRatio || 1;
-  const w = container.clientWidth;
+  const cs = getComputedStyle(container);
+  const padH = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+  const w = container.clientWidth - padH;
   const h = 180;
 
   canvas.width = w * dpr;
@@ -25,7 +27,7 @@ export function renderAssetChart() {
 
   const data = [...snapshots].sort((a, b) => a.date.localeCompare(b.date));
 
-  const pad = { top: 30, right: 28, bottom: 36, left: 46 };
+  const pad = { top: 30, right: 32, bottom: 36, left: 40 };
   const cw = w - pad.left - pad.right;
   const ch = h - pad.top - pad.bottom;
 
