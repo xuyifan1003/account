@@ -25,7 +25,7 @@ export function renderAssetChart() {
 
   const data = [...snapshots].sort((a, b) => a.date.localeCompare(b.date));
 
-  const pad = { top: 30, right: 14, bottom: 36, left: 54 };
+  const pad = { top: 30, right: 28, bottom: 36, left: 46 };
   const cw = w - pad.left - pad.right;
   const ch = h - pad.top - pad.bottom;
 
@@ -133,70 +133,12 @@ export function renderAssetChart() {
     }
   });
 
-  // First & last value badges
-  ctx.font = '600 11px -apple-system, sans-serif';
-  drawValueBadge(ctx, data[0].total_balance, xPos(0), yPos(data[0].total_balance), pad, w, ch, prime);
-  drawValueBadge(ctx, data[data.length - 1].total_balance, xPos(data.length - 1), yPos(data[data.length - 1].total_balance), pad, w, ch, prime);
-}
-
-function drawValueBadge(ctx, value, x, y, pad, w, ch, prime) {
-  const label = formatChartValue(value);
-  const m = ctx.measureText(label);
-  const tw = m.width;
-  const padX = 7, padY = 3;
-  const bw = tw + padX * 2;
-  const bh = 16 + padY * 2;
-
-  let bx = x - bw / 2;
-  let by;
-
-  const chartMid = pad.top + ch / 2;
-  if (y < chartMid) {
-    by = y + 9;
-  } else {
-    by = y - 9 - bh;
-  }
-
-  // Clamp to chart area
-  if (bx < pad.left + 2) bx = pad.left + 2;
-  if (bx + bw > w - pad.right - 2) bx = w - pad.right - 2 - bw;
-  const chartBottom = pad.top + ch;
-  if (by < pad.top + 2) by = pad.top + 2;
-  if (by + bh > chartBottom - 2) by = chartBottom - 2 - bh;
-
-  // Shadow
-  ctx.save();
-  ctx.shadowColor = 'rgba(0,0,0,0.08)';
-  ctx.shadowBlur = 4;
-  ctx.shadowOffsetY = 1;
-  ctx.fillStyle = '#fff';
-  roundRect(ctx, bx, by, bw, bh, 4);
-  ctx.fill();
-  ctx.restore();
-
-  // Border
-  ctx.strokeStyle = '#E8ECF0';
-  ctx.lineWidth = 1;
-  roundRect(ctx, bx, by, bw, bh, 4);
-  ctx.stroke();
-
-  // Text
-  ctx.fillStyle = prime;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(label, x, by + bh / 2);
 }
 
 function formatAxisLabel(v) {
   if (v >= 10000) return (v / 10000).toFixed(1) + '万';
   if (v >= 1000) return (v / 1000).toFixed(1) + '千';
   return Math.round(v).toString();
-}
-
-function formatChartValue(v) {
-  if (v >= 10000) return '¥' + (v / 10000).toFixed(1) + '万';
-  if (v >= 1000) return '¥' + (v / 1000).toFixed(1) + '千';
-  return '¥' + Math.round(v);
 }
 
 function roundRect(ctx, x, y, w, h, r) {
