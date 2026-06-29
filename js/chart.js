@@ -27,7 +27,7 @@ export function renderAssetChart() {
 
   const data = [...snapshots].sort((a, b) => a.date.localeCompare(b.date));
 
-  const pad = { top: 30, right: 32, bottom: 36, left: 40 };
+  const pad = { top: 30, right: 26, bottom: 36, left: 46 };
   const cw = w - pad.left - pad.right;
   const ch = h - pad.top - pad.bottom;
 
