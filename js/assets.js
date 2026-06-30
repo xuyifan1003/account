@@ -27,7 +27,11 @@ export function renderAssets() {
   `).join('');
 
   container.querySelectorAll('.asset-item').forEach(el => {
-    el.addEventListener('click', () => { haptic(); openAssetModal(el.dataset.id); });
+    el.addEventListener('click', () => {
+      haptic();
+      if (!assetsVisible) { toggleAssets(); return; }
+      openAssetModal(el.dataset.id);
+    });
   });
   renderAssetChart();
 }
