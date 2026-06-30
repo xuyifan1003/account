@@ -53,22 +53,39 @@ export function renderRecords() {
     return;
   }
 
-  container.innerHTML = monthRecords.map((r, i) => {
-    const cat = getCategory(r.category);
-    return `
-      <div class="record-item" data-id="${r.id}" style="animation-delay:${i * 0.03}s">
-        <div class="record-icon-wrap ${r.category}">${cat.icon}</div>
-        <div class="record-info">
-          <div class="record-cat">${cat.name}</div>
-          ${r.note ? `<div class="record-note">${r.note}</div>` : ''}
+  monthRecords.sort((a, b) => b.date.localeCompare(a.date) || b.time.localeCompare(a.time));
+
+  const todayStr = getToday();
+  const groups = new Map();
+  monthRecords.forEach(r => {
+    if (!groups.has(r.date)) groups.set(r.date, []);
+    groups.get(r.date).push(r);
+  });
+
+  let html = '';
+  let itemIndex = 0;
+  groups.forEach((records, date) => {
+    const label = date === todayStr ? '今天' : date.slice(5);
+    html += `<div class="date-divider">${label}</div>`;
+    records.forEach(r => {
+      const cat = getCategory(r.category);
+      html += `
+        <div class="record-item" data-id="${r.id}" style="animation-delay:${itemIndex * 0.03}s">
+          <div class="record-icon-wrap ${r.category}">${cat.icon}</div>
+          <div class="record-info">
+            <div class="record-cat">${cat.name}</div>
+            ${r.note ? `<div class="record-note">${r.note}</div>` : ''}
+          </div>
+          <div class="record-right">
+            <div class="record-amount">¥${formatMoney(r.amount)}</div>
+            <div class="record-time">${r.time}</div>
+          </div>
         </div>
-        <div class="record-right">
-          <div class="record-amount">¥${formatMoney(r.amount)}</div>
-          <div class="record-time">${r.date.slice(5)} ${r.time}</div>
-        </div>
-      </div>
-    `;
-  }).join('');
+      `;
+      itemIndex++;
+    });
+  });
+  container.innerHTML = html;
 }
 
 /* ===== Amount Modal ===== */
@@ -248,6 +265,15 @@ export function initBook() {
   document.getElementById('modal-close').addEventListener('click', closeAmountModal);
   document.querySelector('#amount-modal .modal-overlay').addEventListener('click', closeAmountModal);
 
-  // Auto-refresh records every minute
-  setInterval(() => { renderRecords(); renderBookSummary(); }, 60000);
+  // Auto-refresh on month rollover only
+  let _monthKey = null;
+  setInterval(() => {
+    const now = new Date();
+    const key = `${now.getFullYear()}-${now.getMonth()}`;
+    if (key !== _monthKey) {
+      _monthKey = key;
+      renderRecords();
+      renderBookSummary();
+    }
+  }, 60000);
 }

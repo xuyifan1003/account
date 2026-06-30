@@ -131,6 +131,15 @@
   font-weight: 500;
 }
 
+.date-divider {
+  padding: 14px 0 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  letter-spacing: 0.5px;
+}
+.date-divider:first-child { padding-top: 0; }
+
 .empty-tip {
   text-align: center;
   color: var(--text-tertiary);
