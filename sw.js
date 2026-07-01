@@ -1,4 +1,4 @@
-const CACHE = 'money-book-v19';
+const CACHE = 'money-book-v20';
 const URLS = [
   'index.html',
   'manifest.json',
@@ -34,6 +34,21 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const { request: r } = e;
   if (r.method !== 'GET') return;
+
+  // Supabase API: network-first, fallback to cache
+  if (r.url.includes('supabase.co')) {
+    e.respondWith(
+      caches.match(r).then(cached =>
+        fetch(r).then(res => {
+          const clone = res.clone();
+          caches.open(CACHE).then(c => c.put(r, clone));
+          return res;
+        }).catch(() => cached || new Response('', { status: 503 }))
+      )
+    );
+    return;
+  }
+
   e.respondWith(
     caches.match(r).then(cached => {
       const fetchPromise = fetch(r).then(res =>
