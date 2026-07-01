@@ -8,7 +8,7 @@
   text-align: center;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 8px 32px rgba(6, 182, 212, 0.25);
+  box-shadow: 0 8px 32px rgba(61, 61, 61, 0.25);
 }
 .summary-card::before {
   content: '';
@@ -43,13 +43,13 @@
   font-weight: 800;
   position: relative;
   letter-spacing: -1.5px;
-  color: rgba(255,255,255,0.55);
+  color: rgba(255,255,255,0.8);
 }
 .summary-card .summary-amount::before {
   content: '¥';
   font-size: 24px;
   font-weight: 600;
-  color: rgba(255,255,255,0.55);
+  color: rgba(255,255,255,0.8);
   margin-right: 4px;
 }
 

@@ -193,7 +193,7 @@ function buildYearTrend(state) {
 function barColor(amount, max) {
   if (amount <= 0) return 'transparent';
   const pct = amount / max;
-  return `rgba(6, 182, 212, ${(0.15 + pct * 0.85).toFixed(2)})`;
+  return `rgba(61, 61, 61, ${(0.15 + pct * 0.85).toFixed(2)})`;
 }
 
 function prevPeriod() {

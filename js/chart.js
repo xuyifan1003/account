@@ -39,7 +39,7 @@ export function renderAssetChart() {
   const paddedMax = maxVal + range * 0.15;
   const paddedRange = paddedMax - paddedMin || 1;
 
-  const prime = '#06B6D4';
+  const prime = '#3D3D3D';
   const muted = '#94A3B8';
   const grid = '#E8ECF0';
   const plotBg = '#F8F9FA';
@@ -81,8 +81,8 @@ export function renderAssetChart() {
 
   // Gradient fill
   const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + ch);
-  grad.addColorStop(0, 'rgba(6,182,212,0.22)');
-  grad.addColorStop(1, 'rgba(6,182,212,0.02)');
+  grad.addColorStop(0, 'rgba(61,61,61,0.22)');
+  grad.addColorStop(1, 'rgba(61,61,61,0.02)');
 
   ctx.beginPath();
   ctx.moveTo(xPos(0), yPos(data[0].total_balance));
