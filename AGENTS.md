@@ -36,7 +36,7 @@ DOMContentLoaded → await initState → initTabs → initBook → initAssets �
 - **Report page**: `.report-top` fixed, `.report-scroll` (categories) fills middle and scrolls, `.report-trend-fixed` sticks to bottom (hidden in month view)
 
 ## CSS
-- All tokens via CSS custom properties in `variables.css`. `--primary` is `#3D3D3D` — keep hardcoded colors in sync with this
+- All tokens via CSS custom properties in `variables.css`. `--primary` is `#4A4A4A` — keep hardcoded colors in sync with this
 - Mobile-first, max-width 500px, safe-area-inset
 
 ## SW cache (network-first)

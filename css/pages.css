@@ -8,7 +8,7 @@
   text-align: center;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 8px 32px rgba(61, 61, 61, 0.25);
+  box-shadow: 0 8px 32px rgba(74, 74, 74, 0.25);
 }
 .summary-card::before {
   content: '';

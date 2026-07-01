@@ -1,11 +1,11 @@
 /* ===== Design Tokens ===== */
 :root {
   /* Colors */
-  --primary: #3D3D3D;
-  --primary-light: #E8E8E8;
-  --primary-dark: #2A2A2A;
-  --primary-gradient: linear-gradient(135deg, #3D3D3D 0%, #5A5A5A 100%);
-  --primary-soft: linear-gradient(135deg, #F0F0F0 0%, #E8E8E8 100%);
+  --primary: #4A4A4A;
+  --primary-light: #EAEAEA;
+  --primary-dark: #333333;
+  --primary-gradient: linear-gradient(135deg, #4A4A4A 0%, #666666 100%);
+  --primary-soft: linear-gradient(135deg, #F0F0F0 0%, #EAEAEA 100%);
 
   --success: #10B981;
   --success-light: #D1FAE5;
@@ -22,8 +22,8 @@
   --border: #E2E8F0;
 
   /* Shadows */
-  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(61, 61, 61, 0.06);
-  --card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(61, 61, 61, 0.1);
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(74, 74, 74, 0.06);
+  --card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(74, 74, 74, 0.1);
 
   /* Radius */
   --radius: 16px;
