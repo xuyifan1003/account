@@ -286,11 +286,11 @@
   color: #fff;
   font-size: 22px;
   font-weight: 700;
-  box-shadow: 0 4px 12px rgba(139, 131, 255, 0.35);
+  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.35);
 }
 .numpad .key-confirm:active {
   transform: scale(0.96);
-  box-shadow: 0 2px 6px rgba(139, 131, 255, 0.3);
+  box-shadow: 0 2px 6px rgba(6, 182, 212, 0.3);
 }
 .numpad .key-del {
   font-size: 20px;
@@ -308,9 +308,9 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s;
-  box-shadow: 0 4px 12px rgba(139, 131, 255, 0.25);
+  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.25);
 }
-.btn-primary:active { transform: scale(0.97); box-shadow: 0 2px 6px rgba(139, 131, 255, 0.2); }
+.btn-primary:active { transform: scale(0.97); box-shadow: 0 2px 6px rgba(6, 182, 212, 0.2); }
 
 .btn-danger {
   width: 100%;
@@ -340,14 +340,14 @@
   color: #fff;
   font-size: 26px;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(139, 131, 255, 0.4);
+  box-shadow: 0 4px 16px rgba(6, 182, 212, 0.4);
   transition: all 0.2s var(--ease-smooth);
   z-index: 100;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.fab:active { transform: scale(0.9); box-shadow: 0 2px 8px rgba(139, 131, 255, 0.3); }
+.fab:active { transform: scale(0.9); box-shadow: 0 2px 8px rgba(6, 182, 212, 0.3); }
 @media (max-width: 500px) { .fab { right: 20px; } }
 
 /* ===== Toast ===== */
