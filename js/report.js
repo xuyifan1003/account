@@ -88,13 +88,12 @@ function renderCategories(expenseRecords, total) {
         <div class="report-cat-icon ${catId}">${cat.icon}</div>
         <div class="report-cat-body">
           <div class="report-cat-header">
-            <span class="report-cat-name">${cat.name}</span>
+            <span class="report-cat-name">${cat.name} <span class="report-cat-count">${count} 笔</span></span>
             <span class="report-cat-amount">¥${formatMoney(amount)}</span>
           </div>
           <div class="report-cat-bar-wrap">
             <div class="report-cat-bar cat-bar ${catId}" style="width:${maxAmount > 0 ? amount / maxAmount * 100 : 0}%"></div>
           </div>
-          <div class="report-cat-count">${count} 笔</div>
         </div>
         <div class="report-cat-pct">${total > 0 ? Math.round(amount / total * 100) : 0}%</div>
       </div>

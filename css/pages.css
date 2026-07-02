@@ -240,10 +240,11 @@
   color: var(--text);
 }
 
-.report-cat-count {
+.report-cat-name .report-cat-count {
   font-size: 11px;
   color: var(--text-tertiary);
-  margin-bottom: 5px;
+  margin-left: 6px;
+  font-weight: 400;
 }
 
 .report-cat-bar-wrap {
