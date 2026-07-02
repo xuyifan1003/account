@@ -28,12 +28,16 @@ export function renderReport() {
 
   if (viewMode === 'month') {
     const [y, m] = reportDate.split('-').map(Number);
-    const days = new Date(y, m, 0).getDate();
+    const now = new Date();
+    const isCurrent = y === now.getFullYear() && m === now.getMonth() + 1;
+    const days = isCurrent ? now.getDate() : new Date(y, m, 0).getDate();
     document.getElementById('report-sub').textContent =
       `共 ${records.length} 笔 · 日均 ¥${formatMoney(totalExpense / days)}`;
   } else {
+    const y = Number(reportDate);
+    const months = y === new Date().getFullYear() ? new Date().getMonth() + 1 : 12;
     document.getElementById('report-sub').textContent =
-      `共 ${records.length} 笔 · 月均 ¥${formatMoney(totalExpense / 12)}`;
+      `共 ${records.length} 笔 · 月均 ¥${formatMoney(totalExpense / months)}`;
   }
 
   renderCategories(expenseRecords, totalExpense);
