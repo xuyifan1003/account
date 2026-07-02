@@ -69,14 +69,15 @@ function formatPeriod() {
 function renderCategories(expenseRecords, total) {
   const catMap = {};
   expenseRecords.forEach(r => {
-    if (!catMap[r.category]) catMap[r.category] = 0;
-    catMap[r.category] += r.amount;
+    if (!catMap[r.category]) catMap[r.category] = { amount: 0, count: 0 };
+    catMap[r.category].amount += r.amount;
+    catMap[r.category].count++;
   });
 
-  const entries = Object.entries(catMap).sort((a, b) => b[1] - a[1]);
-  const maxAmount = entries.length > 0 ? entries[0][1] : 0;
+  const entries = Object.entries(catMap).sort((a, b) => b[1].amount - a[1].amount);
+  const maxAmount = entries.length > 0 ? entries[0][1].amount : 0;
 
-  document.getElementById('report-categories').innerHTML = entries.map(([catId, amount]) => {
+  document.getElementById('report-categories').innerHTML = entries.map(([catId, { amount, count }]) => {
     const cat = getCategory(catId);
     return `
       <div class="report-cat-row">
@@ -89,6 +90,7 @@ function renderCategories(expenseRecords, total) {
           <div class="report-cat-bar-wrap">
             <div class="report-cat-bar cat-bar ${catId}" style="width:${maxAmount > 0 ? amount / maxAmount * 100 : 0}%"></div>
           </div>
+          <div class="report-cat-count">${count} 笔</div>
         </div>
         <div class="report-cat-pct">${total > 0 ? Math.round(amount / total * 100) : 0}%</div>
       </div>

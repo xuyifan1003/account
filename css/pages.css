@@ -240,6 +240,12 @@
   color: var(--text);
 }
 
+.report-cat-count {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-bottom: 5px;
+}
+
 .report-cat-bar-wrap {
   height: 9px;
   background: var(--bg);
