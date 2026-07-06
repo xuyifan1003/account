@@ -39,7 +39,7 @@ function mapAssetToDb(a) {
 
 export async function initState() {
   try {
-    const [records, assetsData, snapshots] = await Promise.all([
+    const [serverRecords, assetsData, snapshots] = await Promise.all([
       api('GET', 'records', null, 'order=date.desc&order=time.desc'),
       api('GET', 'assets', null, 'order=sort.asc'),
       api('GET', 'asset_snapshots', null, 'order=date.asc').catch(() => []),
@@ -47,6 +47,14 @@ export async function initState() {
 
     const assets = assetsData.map(mapAssetFromDb);
     const snap = snapshots.map(s => ({ id: s.id, total_balance: s.total_balance, date: s.date }));
+
+    // 合并本地已有记录，避免覆盖用户在 initState 完成前添加的数据
+    let records = serverRecords;
+    if (state && state.records.length > 0) {
+      const serverIds = new Set(serverRecords.map(r => r.id));
+      const localOnly = state.records.filter(r => !serverIds.has(r.id));
+      records = [...localOnly, ...serverRecords];
+    }
 
     if (assets.length === 0) {
       state = { records, assets: JSON.parse(JSON.stringify(DEFAULT_ASSETS)), snapshots: snap };
@@ -56,7 +64,7 @@ export async function initState() {
     }
   } catch(e) {
     console.warn('Supabase read failed:', e);
-    state = { records: [], assets: JSON.parse(JSON.stringify(DEFAULT_ASSETS)), snapshots: [] };
+    if (!state) state = { records: [], assets: JSON.parse(JSON.stringify(DEFAULT_ASSETS)), snapshots: [] };
   }
 }
 
