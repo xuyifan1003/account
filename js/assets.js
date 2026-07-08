@@ -47,6 +47,7 @@ function openAssetModal(id) {
   modal.querySelector('.modal-overlay').classList.remove('closing');
   modal.querySelector('.modal-content').classList.remove('closing');
   modal.classList.remove('hidden');
+  document.documentElement.style.overscrollBehaviorX = 'contain';
   history.pushState({ modal: true }, '');
   assetModalAmount = '0';
   assetModalHasDecimal = false;
@@ -65,6 +66,7 @@ function _closeAssetModalWithAnim() {
     modal.classList.add('hidden');
     overlay.classList.remove('closing');
     content.classList.remove('closing');
+    document.documentElement.style.overscrollBehaviorX = '';
   }, { once: true });
 }
 

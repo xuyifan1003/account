@@ -98,6 +98,7 @@ function openAmountModal(catId) {
   modal.querySelector('.modal-overlay').classList.remove('closing');
   modal.querySelector('.modal-content').classList.remove('closing');
   modal.classList.remove('hidden');
+  document.documentElement.style.overscrollBehaviorX = 'contain';
   history.pushState({ modal: true }, '');
   modalAmount = '0';
   modalHasDecimal = false;
@@ -115,6 +116,7 @@ function _closeModalWithAnim(modalEl) {
     modalEl.classList.add('hidden');
     overlay.classList.remove('closing');
     content.classList.remove('closing');
+    document.documentElement.style.overscrollBehaviorX = '';
   }, { once: true });
 }
 
