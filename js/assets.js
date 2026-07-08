@@ -43,14 +43,34 @@ function openAssetModal(id) {
   if (!asset) return;
   document.getElementById('asset-modal-title').textContent = `${asset.icon || '🏦'} ${asset.name}`;
   document.getElementById('asset-amount-value').textContent = '0';
-  document.getElementById('asset-modal').classList.remove('hidden');
+  const modal = document.getElementById('asset-modal');
+  modal.querySelector('.modal-overlay').classList.remove('closing');
+  modal.querySelector('.modal-content').classList.remove('closing');
+  modal.classList.remove('hidden');
+  history.pushState({ modal: true }, '');
   assetModalAmount = '0';
   assetModalHasDecimal = false;
   assetModalDecimalDigits = 0;
 }
 
+function _closeAssetModalWithAnim() {
+  const modal = document.getElementById('asset-modal');
+  if (modal.classList.contains('hidden')) return;
+  const overlay = modal.querySelector('.modal-overlay');
+  const content = modal.querySelector('.modal-content');
+  if (content.classList.contains('closing')) return;
+  overlay.classList.add('closing');
+  content.classList.add('closing');
+  content.addEventListener('animationend', () => {
+    modal.classList.add('hidden');
+    overlay.classList.remove('closing');
+    content.classList.remove('closing');
+  }, { once: true });
+}
+
 function closeAssetModal() {
-  document.getElementById('asset-modal').classList.add('hidden');
+  _closeAssetModalWithAnim();
+  if (history.state?.modal) history.back();
 }
 
 function updateAssetDisplay() {
@@ -144,6 +164,9 @@ export function initAssets() {
 
   document.getElementById('asset-close').addEventListener('click', closeAssetModal);
   document.querySelector('#asset-modal .modal-overlay').addEventListener('click', closeAssetModal);
+  window.addEventListener('popstate', () => {
+    _closeAssetModalWithAnim();
+  });
   document.querySelectorAll('#asset-modal .numpad button').forEach(btn => {
     if (btn.dataset.assetKey === 'del') {
       let repeatTimer = null;

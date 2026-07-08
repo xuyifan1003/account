@@ -26,6 +26,28 @@ const DEFAULT_ASSETS = [
   { id:'asset-gold', name:'黄金', icon:'🥇', iconClass:'gold', balance:0, sort:6 },
 ];
 
+/* ===== Cache ===== */
+const STATE_KEY = 'money-book-state-v1';
+
+function loadCachedState() {
+  try {
+    const raw = localStorage.getItem(STATE_KEY);
+    if (raw) {
+      const data = JSON.parse(raw);
+      if (data && data.records && data.assets) {
+        state = data;
+        return true;
+      }
+    }
+  } catch (e) { /* ignore */ }
+  return false;
+}
+
+function saveCachedState() {
+  try { localStorage.setItem(STATE_KEY, JSON.stringify(state)); }
+  catch (e) { /* ignore */ }
+}
+
 /* ===== State Management ===== */
 let state = null;
 
@@ -37,35 +59,42 @@ function mapAssetToDb(a) {
   return { id: a.id, name: a.name, icon: a.icon, icon_class: a.iconClass, balance: a.balance, sort: a.sort };
 }
 
-export async function initState() {
-  try {
-    const [serverRecords, assetsData, snapshots] = await Promise.all([
-      api('GET', 'records', null, 'order=date.desc&order=time.desc'),
-      api('GET', 'assets', null, 'order=sort.asc'),
-      api('GET', 'asset_snapshots', null, 'order=date.asc').catch(() => []),
-    ]);
+export function initState() {
+  loadCachedState();
 
-    const assets = assetsData.map(mapAssetFromDb);
-    const snap = snapshots.map(s => ({ id: s.id, total_balance: s.total_balance, date: s.date }));
+  return (async () => {
+    try {
+      const [serverRecords, assetsData, snapshots] = await Promise.all([
+        api('GET', 'records', null, 'order=date.desc&order=time.desc'),
+        api('GET', 'assets', null, 'order=sort.asc'),
+        api('GET', 'asset_snapshots', null, 'order=date.asc').catch(() => []),
+      ]);
 
-    // 合并本地已有记录，避免覆盖用户在 initState 完成前添加的数据
-    let records = serverRecords;
-    if (state && state.records.length > 0) {
-      const serverIds = new Set(serverRecords.map(r => r.id));
-      const localOnly = state.records.filter(r => !serverIds.has(r.id));
-      records = [...localOnly, ...serverRecords];
-    }
+      const assets = assetsData.length ? assetsData.map(mapAssetFromDb)
+        : JSON.parse(JSON.stringify(DEFAULT_ASSETS));
+      const snap = snapshots.map(s => ({ id: s.id, total_balance: s.total_balance, date: s.date }));
 
-    if (assets.length === 0) {
-      state = { records, assets: JSON.parse(JSON.stringify(DEFAULT_ASSETS)), snapshots: snap };
-      api('POST', 'assets', state.assets.map(mapAssetToDb), 'on_conflict=id').catch(() => {});
-    } else {
+      // 合并本地已有记录，避免覆盖用户在 initState 完成前添加的数据
+      let records = serverRecords;
+      if (state && state.records.length > 0) {
+        const serverIds = new Set(serverRecords.map(r => r.id));
+        const localOnly = state.records.filter(r => !serverIds.has(r.id));
+        records = [...localOnly, ...serverRecords];
+      }
+
       state = { records, assets, snapshots: snap };
+
+      if (assetsData.length === 0) {
+        api('POST', 'assets', state.assets.map(mapAssetToDb), 'on_conflict=id').catch(() => {});
+      }
+
+      saveCachedState();
+    } catch(e) {
+      console.warn('Supabase read failed:', e);
+      if (!state) state = { records: [], assets: JSON.parse(JSON.stringify(DEFAULT_ASSETS)), snapshots: [] };
+      throw e;
     }
-  } catch(e) {
-    console.warn('Supabase read failed:', e);
-    if (!state) state = { records: [], assets: JSON.parse(JSON.stringify(DEFAULT_ASSETS)), snapshots: [] };
-  }
+  })();
 }
 
 export function getState() {
@@ -83,6 +112,7 @@ function normalizeRecord(r) {
 }
 
 export function saveState() {
+  saveCachedState();
   let failed = false;
   const warn = (label, e) => { console.warn(label, e); failed = true; };
   Promise.all([
@@ -105,6 +135,7 @@ export function saveSnapshot() {
     state.snapshots.push(snap);
   }
 
+  saveCachedState();
   api('POST', 'asset_snapshots', snap, 'on_conflict=id').catch(e => console.warn('save snapshot:', e));
 }
 

@@ -94,14 +94,33 @@ function openAmountModal(catId) {
   document.getElementById('modal-category-name').textContent = cat.icon + ' ' + cat.name;
   document.getElementById('amount-value').textContent = '0';
   document.getElementById('input-note').value = '';
-  document.getElementById('amount-modal').classList.remove('hidden');
+  const modal = document.getElementById('amount-modal');
+  modal.querySelector('.modal-overlay').classList.remove('closing');
+  modal.querySelector('.modal-content').classList.remove('closing');
+  modal.classList.remove('hidden');
+  history.pushState({ modal: true }, '');
   modalAmount = '0';
   modalHasDecimal = false;
   modalDecimalDigits = 0;
 }
 
+function _closeModalWithAnim(modalEl) {
+  if (modalEl.classList.contains('hidden')) return;
+  const overlay = modalEl.querySelector('.modal-overlay');
+  const content = modalEl.querySelector('.modal-content');
+  if (content.classList.contains('closing')) return;
+  overlay.classList.add('closing');
+  content.classList.add('closing');
+  content.addEventListener('animationend', () => {
+    modalEl.classList.add('hidden');
+    overlay.classList.remove('closing');
+    content.classList.remove('closing');
+  }, { once: true });
+}
+
 function closeAmountModal() {
-  document.getElementById('amount-modal').classList.add('hidden');
+  _closeModalWithAnim(document.getElementById('amount-modal'));
+  if (history.state?.modal) history.back();
 }
 
 /* ===== Numpad ===== */
@@ -264,6 +283,9 @@ export function initBook() {
   // Modal close
   document.getElementById('modal-close').addEventListener('click', closeAmountModal);
   document.querySelector('#amount-modal .modal-overlay').addEventListener('click', closeAmountModal);
+  window.addEventListener('popstate', () => {
+    _closeModalWithAnim(document.getElementById('amount-modal'));
+  });
 
   // Auto-refresh on month rollover only
   let _monthKey = null;
