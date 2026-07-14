@@ -228,7 +228,6 @@ export function initBook() {
     lpTimer = setTimeout(() => {
       item.classList.remove('pressing');
       lpItem = null;
-      haptic();
       const record = getState().records.find(r => r.id === id);
       if (!record) return;
       deletingId = id;
