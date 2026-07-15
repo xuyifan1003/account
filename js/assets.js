@@ -37,6 +37,14 @@ export function renderAssets() {
 }
 
 /* ===== Asset Modal ===== */
+function _preventEdgeSwipe(e) {
+  if (e.touches[0].clientX >= 30) return;
+  const modal = document.getElementById('asset-modal');
+  if (modal && !modal.classList.contains('hidden')) {
+    e.preventDefault();
+  }
+}
+
 function openAssetModal(id) {
   editingAssetId = id;
   const asset = getState().assets.find(a => a.id === id);
@@ -47,7 +55,8 @@ function openAssetModal(id) {
   modal.querySelector('.modal-overlay').classList.remove('closing');
   modal.querySelector('.modal-content').classList.remove('closing');
   modal.classList.remove('hidden');
-  document.documentElement.style.overscrollBehaviorX = 'contain';
+  document.documentElement.style.overscrollBehaviorX = 'none';
+  document.addEventListener('touchstart', _preventEdgeSwipe, { passive: false });
   history.pushState({ modal: true }, '');
   assetModalAmount = '0';
   assetModalHasDecimal = false;
@@ -67,6 +76,7 @@ function _closeAssetModalWithAnim() {
     overlay.classList.remove('closing');
     content.classList.remove('closing');
     document.documentElement.style.overscrollBehaviorX = '';
+    document.removeEventListener('touchstart', _preventEdgeSwipe);
   }, { once: true });
 }
 

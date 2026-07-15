@@ -89,6 +89,14 @@ export function renderRecords() {
 }
 
 /* ===== Amount Modal ===== */
+function _preventEdgeSwipe(e) {
+  if (e.touches[0].clientX >= 30) return;
+  const modal = document.getElementById('amount-modal');
+  if (modal && !modal.classList.contains('hidden')) {
+    e.preventDefault();
+  }
+}
+
 function openAmountModal(catId) {
   const cat = getCategory(catId);
   document.getElementById('modal-category-name').textContent = cat.icon + ' ' + cat.name;
@@ -98,7 +106,8 @@ function openAmountModal(catId) {
   modal.querySelector('.modal-overlay').classList.remove('closing');
   modal.querySelector('.modal-content').classList.remove('closing');
   modal.classList.remove('hidden');
-  document.documentElement.style.overscrollBehaviorX = 'contain';
+  document.documentElement.style.overscrollBehaviorX = 'none';
+  document.addEventListener('touchstart', _preventEdgeSwipe, { passive: false });
   history.pushState({ modal: true }, '');
   modalAmount = '0';
   modalHasDecimal = false;
@@ -117,6 +126,7 @@ function _closeModalWithAnim(modalEl) {
     overlay.classList.remove('closing');
     content.classList.remove('closing');
     document.documentElement.style.overscrollBehaviorX = '';
+    document.removeEventListener('touchstart', _preventEdgeSwipe);
   }, { once: true });
 }
 

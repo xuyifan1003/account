@@ -160,6 +160,7 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  touch-action: pan-y;
 }
 .modal.hidden { display: none; }
 
