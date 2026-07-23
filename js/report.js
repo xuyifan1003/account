@@ -1,5 +1,5 @@
 import { getState, getCategory } from './state.js';
-import { getTodayMonth, formatMoney, haptic } from './utils.js';
+import { getToday, getTodayMonth, formatMoney, haptic } from './utils.js';
 
 let viewMode = 'month';
 let reportDate = getTodayMonth();
@@ -41,12 +41,8 @@ export function renderReport() {
   }
 
   renderCategories(expenseRecords, totalExpense);
-  if (viewMode === 'year') {
-    document.getElementById('trend-section').style.display = 'block';
-    renderTrend(state);
-  } else {
-    document.getElementById('trend-section').style.display = 'none';
-  }
+  document.getElementById('trend-section').style.display = 'block';
+  renderTrend(state);
 }
 
 function matchPeriod(dateStr) {
@@ -104,7 +100,7 @@ function renderCategories(expenseRecords, total) {
 function renderTrend(state) {
   const data = getTrendData(state);
   const el = document.getElementById('report-trend');
-  const currentPeriod = viewMode === 'month' ? reportDate : getTodayMonth();
+  const currentPeriod = viewMode === 'month' ? getToday() : getTodayMonth();
 
   el.innerHTML = data.map(d => {
     const isActive = d.period === currentPeriod;
@@ -122,7 +118,7 @@ function renderTrend(state) {
       haptic();
       const period = col.dataset.period;
       const mode = col.dataset.mode;
-      if (period) {
+      if (period && mode !== 'day') {
         if (mode === 'year') {
           viewMode = 'year';
           reportDate = period;
@@ -139,25 +135,29 @@ function renderTrend(state) {
 
 function getTrendData(state) {
   if (viewMode === 'month') {
-    return buildMonthTrend(state);
+    return buildDayTrend(state);
   }
   return buildYearTrend(state);
 }
 
-function buildMonthTrend(state) {
-  const [y, m] = reportDate.split('-').map(Number);
+function buildDayTrend(state) {
+  const today = new Date();
   const data = [];
   for (let i = 11; i >= 0; i--) {
-    const d = new Date(y, m - 1 - i, 1);
-    const period = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const period = `${y}-${m}-${day}`;
     const expense = state.records
-      .filter(r => r.date.startsWith(period) && r.type === 'expense')
+      .filter(r => r.date === period && r.type === 'expense')
       .reduce((s, r) => s + r.amount, 0);
     data.push({
       period,
-      label: (d.getMonth() === 0 ? `${d.getFullYear()}` + '年' : '') + (d.getMonth() + 1) + '月',
+      label: d.getDate() + '号',
       amount: expense,
-      targetMode: 'month',
+      targetMode: 'day',
     });
   }
 
@@ -228,13 +228,12 @@ function nextPeriod() {
 function updateToggleButtons() {
   document.getElementById('view-month').classList.toggle('active', viewMode === 'month');
   document.getElementById('view-year').classList.toggle('active', viewMode === 'year');
+  document.getElementById('trend-section').style.display = 'block';
   if (viewMode === 'year') {
-    document.getElementById('trend-section').style.display = 'block';
     document.getElementById('trend-title').style.display = 'none';
   } else {
-    document.getElementById('trend-section').style.display = 'none';
     document.getElementById('trend-title').style.display = 'block';
-    document.getElementById('trend-title').textContent = '近12月趋势';
+    document.getElementById('trend-title').textContent = '近12日趋势';
   }
 }
 
