@@ -229,12 +229,7 @@ function updateToggleButtons() {
   document.getElementById('view-month').classList.toggle('active', viewMode === 'month');
   document.getElementById('view-year').classList.toggle('active', viewMode === 'year');
   document.getElementById('trend-section').style.display = 'block';
-  if (viewMode === 'year') {
-    document.getElementById('trend-title').style.display = 'none';
-  } else {
-    document.getElementById('trend-title').style.display = 'block';
-    document.getElementById('trend-title').textContent = '近12日趋势';
-  }
+  document.getElementById('trend-title').style.display = 'none';
 }
 
 function switchView(mode) {
