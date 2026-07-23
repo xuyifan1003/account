@@ -56,7 +56,9 @@ function openAssetModal(id) {
   modal.querySelector('.modal-content').classList.remove('closing');
   modal.classList.remove('hidden');
   document.documentElement.style.overscrollBehaviorX = 'none';
-  document.addEventListener('touchstart', _preventEdgeSwipe, { passive: false });
+  document.documentElement.style.touchAction = 'none';
+  document.addEventListener('touchstart', _preventEdgeSwipe, { passive: false, capture: true });
+  document.addEventListener('touchmove', _preventEdgeSwipe, { passive: false, capture: true });
   history.pushState({ modal: true }, '');
   assetModalAmount = '0';
   assetModalHasDecimal = false;
@@ -76,7 +78,9 @@ function _closeAssetModalWithAnim() {
     overlay.classList.remove('closing');
     content.classList.remove('closing');
     document.documentElement.style.overscrollBehaviorX = '';
-    document.removeEventListener('touchstart', _preventEdgeSwipe);
+    document.documentElement.style.touchAction = '';
+    document.removeEventListener('touchstart', _preventEdgeSwipe, true);
+    document.removeEventListener('touchmove', _preventEdgeSwipe, true);
   }, { once: true });
 }
 
