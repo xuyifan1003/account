@@ -94,6 +94,7 @@
   color: var(--text);
   letter-spacing: -0.3px;
 }
+.asset-balance-pct { font-size: 12px; color: var(--text-tertiary); font-weight: 500; }
 #asset-delete-row { margin-top: 8px; }
 
 /* ===== View Toggle ===== */

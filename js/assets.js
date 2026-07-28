@@ -22,7 +22,7 @@ export function renderAssets() {
       <div class="asset-info">
         <div class="asset-name">${a.name}</div>
       </div>
-      <div class="asset-balance">${assetsVisible ? '¥' + formatMoney(a.balance) : '••••'}</div>
+      <div class="asset-balance">${assetsVisible ? '¥' + formatMoney(a.balance) : '••••'}<span class="asset-balance-pct">${assetsVisible ? ' ' + ((total > 0 ? a.balance / total * 100 : 0)).toFixed(1) + '%' : ''}</span></div>
     </div>
   `).join('');
 
