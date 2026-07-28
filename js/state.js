@@ -8,8 +8,7 @@ export const CATEGORIES = [
   { id:'transport', name:'交通', icon:'🚗', type:'expense' },
   { id:'clothing', name:'服饰', icon:'👗', type:'expense' },
   { id:'entertainment', name:'娱乐', icon:'🎮', type:'expense' },
-  { id:'communication', name:'通讯', icon:'📱', type:'expense' },
-  { id:'digital', name:'数码', icon:'💻', type:'expense' },
+
   { id:'medical', name:'医疗', icon:'💊', type:'expense' },
   { id:'housing', name:'住房', icon:'🏡', type:'expense' },
   { id:'study', name:'学习', icon:'📝', type:'expense' },
@@ -81,6 +80,15 @@ export function initState() {
         const localOnly = state.records.filter(r => !serverIds.has(r.id));
         records = [...localOnly, ...serverRecords];
       }
+
+      // 迁移旧分类：数码/通讯 → 日用
+      records.forEach(r => {
+        if (r.category === 'digital' || r.category === 'communication') {
+          r.category = 'daily';
+        }
+      });
+      api('PATCH', 'records', { category: 'daily' }, 'category=eq.digital').catch(() => {});
+      api('PATCH', 'records', { category: 'daily' }, 'category=eq.communication').catch(() => {});
 
       state = { records, assets, snapshots: snap };
 

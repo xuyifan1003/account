@@ -94,16 +94,14 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 /* Shared category colors for cat-icon-wrap, record-icon-wrap, report-cat-icon */
-.cat-icon-wrap.food, .record-icon-wrap.food, .report-cat-icon.food { background: linear-gradient(135deg, #FFE4E6, #FECDD3); }
+.cat-icon-wrap.food, .record-icon-wrap.food, .report-cat-icon.food { background: linear-gradient(135deg, #FFD4D4, #FFB8B8); }
 .cat-icon-wrap.daily, .record-icon-wrap.daily, .report-cat-icon.daily { background: linear-gradient(135deg, #DBEAFE, #BFDBFE); }
-.cat-icon-wrap.transport, .record-icon-wrap.transport, .report-cat-icon.transport { background: linear-gradient(135deg, #E0E7FF, #C7D2FE); }
+.cat-icon-wrap.transport, .record-icon-wrap.transport, .report-cat-icon.transport { background: linear-gradient(135deg, #D1FAE5, #A7F3D0); }
 .cat-icon-wrap.clothing, .record-icon-wrap.clothing, .report-cat-icon.clothing { background: linear-gradient(135deg, #FCE7F3, #FBCFE8); }
 .cat-icon-wrap.entertainment, .record-icon-wrap.entertainment, .report-cat-icon.entertainment { background: linear-gradient(135deg, #EDE9FE, #DDD6FE); }
-.cat-icon-wrap.communication, .record-icon-wrap.communication, .report-cat-icon.communication { background: linear-gradient(135deg, #E0F2FE, #BAE6FD); }
-.cat-icon-wrap.digital, .record-icon-wrap.digital, .report-cat-icon.digital { background: linear-gradient(135deg, #F1F5F9, #CBD5E1); }
-.cat-icon-wrap.medical, .record-icon-wrap.medical, .report-cat-icon.medical { background: linear-gradient(135deg, #FEE2E2, #FECACA); }
+.cat-icon-wrap.medical, .record-icon-wrap.medical, .report-cat-icon.medical { background: linear-gradient(135deg, #FFE4E6, #FECDD3); }
 .cat-icon-wrap.housing, .record-icon-wrap.housing, .report-cat-icon.housing { background: linear-gradient(135deg, #FEF3C7, #FDE68A); }
-.cat-icon-wrap.study, .record-icon-wrap.study, .report-cat-icon.study { background: linear-gradient(135deg, #D1FAE5, #A7F3D0); }
+.cat-icon-wrap.study, .record-icon-wrap.study, .report-cat-icon.study { background: linear-gradient(135deg, #E0E7FF, #C7D2FE); }
 .cat-icon-wrap.social, .record-icon-wrap.social, .report-cat-icon.social { background: linear-gradient(135deg, #FFEDD5, #FED7AA); }
 
 .record-info { flex: 1; min-width: 0; }

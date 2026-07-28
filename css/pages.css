@@ -270,16 +270,14 @@
 }
 
 /* ===== Category Bar Colors ===== */
-.cat-bar.food { background: #FDA4AF; }
+.cat-bar.food { background: #FF7E7E; }
 .cat-bar.daily { background: #93C5FD; }
-.cat-bar.transport { background: #A5B4FC; }
+.cat-bar.transport { background: #6EE7B7; }
 .cat-bar.clothing { background: #F9A8D4; }
 .cat-bar.entertainment { background: #C4B5FD; }
-.cat-bar.communication { background: #7DD3FC; }
-.cat-bar.digital { background: #CBD5E1; }
-.cat-bar.medical { background: #FCA5A5; }
+.cat-bar.medical { background: #FDA4AF; }
 .cat-bar.housing { background: #FCD34D; }
-.cat-bar.study { background: #6EE7B7; }
+.cat-bar.study { background: #A5B4FC; }
 .cat-bar.social { background: #FDBA74; }
 
 /* ===== Trend Chart ===== */

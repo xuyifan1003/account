@@ -19,6 +19,7 @@ DOMContentLoaded → initTabs → initBook → initAssets → initReport
 ```
 - `initState()` is **sync** — loads localStorage cache instantly, returns a promise for remote fetch
 - Two-phase render eliminates blank-screen wait
+- **Category migration**: `initState()` auto-migrates old `digital`/`communication` records → `daily` (both in-memory and via `api('PATCH')` on server)
 
 ## Data flow
 - **DB**: Supabase REST via `js/db.js` (`api()`). Tables: `records`, `assets`, `asset_snapshots`
@@ -30,7 +31,7 @@ DOMContentLoaded → initTabs → initBook → initAssets → initReport
 
 ## Key conventions
 - **State**: `{ records: [...], assets: [...], snapshots: [...] }`. localStorage + in-memory
-- **Records** prepended (`unshift`). All 11 categories are `type: 'expense'` — no income
+- **Records** prepended (`unshift`). All 9 categories are `type: 'expense'` — no income
 - **IDs**: `Date.now().toString(36) + Math.random().toString(36).slice(2, 5)`
 - **Amounts**: raw numbers, display with `.toFixed(2)`. Numpad: ≤10 integer digits, ≤2 decimals
 - **Assets**: sorted by balance desc at render time (`assets.js:15`)
