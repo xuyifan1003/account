@@ -13,8 +13,14 @@ export async function api(method, table, body, query = '') {
   if (method === 'POST' || method === 'PATCH') {
     headers.Prefer = 'resolution=merge-duplicates';
   }
-  const res = await fetch(url, { method, headers, body: body ? JSON.stringify(body) : undefined });
-  if (!res.ok) throw new Error(`DB ${method} ${table}: ${res.status}`);
-  const text = await res.text();
-  return text ? JSON.parse(text) : [];
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15000);
+  try {
+    const res = await fetch(url, { method, headers, body: body ? JSON.stringify(body) : undefined, signal: controller.signal });
+    if (!res.ok) throw new Error(`DB ${method} ${table}: ${res.status}`);
+    const text = await res.text();
+    return text ? JSON.parse(text) : [];
+  } finally {
+    clearTimeout(timer);
+  }
 }

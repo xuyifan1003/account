@@ -97,7 +97,7 @@ function handleAssetNumpad(key) {
   haptic();
   if (key === 'confirm') {
     const val = parseFloat(assetModalAmount);
-    if (val <= 0) {
+    if (isNaN(val) || val <= 0) {
       shakeElement(document.querySelector('#asset-modal .amount-display'));
       return;
     }

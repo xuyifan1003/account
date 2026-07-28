@@ -144,7 +144,7 @@ function handleNumpad(key) {
   haptic();
   if (key === 'confirm') {
     const val = parseFloat(modalAmount);
-    if (val <= 0) {
+    if (isNaN(val) || val <= 0) {
       shakeElement(document.querySelector('.amount-display'));
       return;
     }
@@ -261,18 +261,23 @@ export function initBook() {
     document.getElementById('delete-modal').classList.add('hidden');
     deletingId = null;
   }
-  document.getElementById('delete-confirm').addEventListener('click', () => {
+  document.getElementById('delete-confirm').addEventListener('click', async () => {
     if (!deletingId) return;
-    const state = getState();
-    state.records = state.records.filter(r => r.id !== deletingId);
     const id = deletingId;
     deletingId = null;
-    saveState();
-    api('DELETE', 'records', null, `id=eq.${id}`).catch(e => console.warn('delete failed:', e));
-    closeDelete();
-    renderRecords();
-    renderBookSummary();
-    showToast('已删除');
+    try {
+      await api('DELETE', 'records', null, `id=eq.${id}`);
+      const state = getState();
+      state.records = state.records.filter(r => r.id !== id);
+      saveState();
+      closeDelete();
+      renderRecords();
+      renderBookSummary();
+      showToast('已删除');
+    } catch (e) {
+      showToast('删除失败，请检查网络');
+      closeDelete();
+    }
   });
   document.getElementById('delete-cancel').addEventListener('click', closeDelete);
   document.querySelector('#delete-modal .modal-overlay').addEventListener('click', closeDelete);
