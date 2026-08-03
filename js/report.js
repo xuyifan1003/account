@@ -131,6 +131,10 @@ function renderTrend(state) {
       }
     });
   });
+
+  if (viewMode === 'month' && reportDate === getTodayMonth()) {
+    el.scrollLeft = el.scrollWidth;
+  }
 }
 
 function getTrendData(state) {
@@ -141,21 +145,19 @@ function getTrendData(state) {
 }
 
 function buildDayTrend(state) {
-  const today = new Date();
+  const [y, m] = reportDate.split('-').map(Number);
+  const now = new Date();
+  const isCurrent = y === now.getFullYear() && m === now.getMonth() + 1;
+  const totalDays = isCurrent ? now.getDate() : new Date(y, m, 0).getDate();
   const data = [];
-  for (let i = 11; i >= 0; i--) {
-    const d = new Date(today);
-    d.setDate(d.getDate() - i);
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    const period = `${y}-${m}-${day}`;
+  for (let day = 1; day <= totalDays; day++) {
+    const period = `${y}-${String(m).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     const expense = state.records
       .filter(r => r.date === period && r.type === 'expense')
       .reduce((s, r) => s + r.amount, 0);
     data.push({
       period,
-      label: d.getDate() + '号',
+      label: day + '号',
       amount: expense,
       targetMode: 'day',
     });

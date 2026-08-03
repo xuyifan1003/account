@@ -285,13 +285,19 @@
 #report-trend {
   display: flex;
   align-items: flex-end;
-  gap: 5px;
+  gap: 4px;
   height: 105px;
   padding-top: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+#report-trend::-webkit-scrollbar {
+  display: none;
 }
 
 .trend-col {
-  flex: 1;
+  flex: 0 0 36px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
