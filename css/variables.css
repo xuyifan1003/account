@@ -33,7 +33,7 @@
   /* Dimensions */
   --tab-height: 58px;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --safe-top: calc(env(safe-area-inset-top, 0px) + 10px);
+  --safe-top: calc(env(safe-area-inset-top, 0px) + 18px);
 
   /* Transitions */
   --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);

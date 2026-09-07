@@ -15,7 +15,7 @@
 .page {
   flex: 1;
   overflow-y: auto;
-  padding: var(--safe-top) 12px calc(80px + var(--safe-bottom));
+  padding: var(--safe-top) 12px calc(var(--tab-height) + 10px + var(--safe-bottom));
   display: none;
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
@@ -47,7 +47,7 @@
   overflow: hidden;
   padding-top: 2px;
 }
-.report-trend-fixed { flex-shrink: 0; padding-top: 6px; }
+.report-trend-fixed { flex-shrink: 0; padding-top: 8px; }
 .page.active { display: block; animation: pageIn 0.25s ease; }
 @keyframes pageIn {
   from { opacity: 0; transform: translateY(8px); }
@@ -111,7 +111,7 @@
   font-size: 13px;
   font-weight: 700;
   color: var(--text);
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -127,6 +127,6 @@
 
 /* ===== Safe Area ===== */
 @supports(padding-bottom:env(safe-area-inset-bottom)){
-  .page { padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px)); }
+  .page { padding-bottom: calc(var(--tab-height) + 10px + env(safe-area-inset-bottom, 0px)); }
   #tab-bar { padding-bottom: env(safe-area-inset-bottom, 0px); }
 }
