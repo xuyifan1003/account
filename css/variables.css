@@ -26,14 +26,14 @@
   --card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(74, 74, 74, 0.1);
 
   /* Radius */
-  --radius: 16px;
-  --radius-sm: 10px;
-  --radius-xs: 8px;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-xs: 6px;
 
   /* Dimensions */
-  --tab-height: 70px;
+  --tab-height: 58px;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --safe-top: calc(env(safe-area-inset-top, 0px) + 16px);
+  --safe-top: calc(env(safe-area-inset-top, 0px) + 10px);
 
   /* Transitions */
   --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
@@ -48,7 +48,7 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
   background: var(--bg);
   color: var(--text);
-  font-size: 15px;
+  font-size: 13px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-tap-highlight-color: transparent;

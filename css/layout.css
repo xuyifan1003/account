@@ -15,7 +15,7 @@
 .page {
   flex: 1;
   overflow-y: auto;
-  padding: var(--safe-top) 16px calc(80px + var(--safe-bottom));
+  padding: var(--safe-top) 12px calc(80px + var(--safe-bottom));
   display: none;
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
@@ -47,7 +47,7 @@
   overflow: hidden;
   padding-top: 2px;
 }
-.report-trend-fixed { flex-shrink: 0; padding-top: 10px; }
+.report-trend-fixed { flex-shrink: 0; padding-top: 6px; }
 .page.active { display: block; animation: pageIn 0.25s ease; }
 @keyframes pageIn {
   from { opacity: 0; transform: translateY(8px); }
@@ -88,10 +88,10 @@
 }
 .tab.active { color: var(--primary); }
 .tab .tab-icon {
-  font-size: 24px;
+  font-size: 20px;
   line-height: 1;
-  width: 40px;
-  height: 28px;
+  width: 34px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -100,7 +100,7 @@
 }
 .tab.active .tab-icon { background: var(--primary-light); }
 .tab .tab-label {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.2px;
   transition: all 0.2s;
@@ -108,10 +108,10 @@
 
 /* ===== Section Title ===== */
 .section-title {
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--text);
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -119,7 +119,7 @@
 .section-title::before {
   content: '';
   width: 3px;
-  height: 16px;
+  height: 13px;
   border-radius: 3px;
   background: var(--primary-gradient);
   flex-shrink: 0;

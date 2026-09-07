@@ -2,14 +2,14 @@
 #category-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
+  gap: 8px;
 }
 .cat-btn {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 12px 6px 8px;
+  padding: 9px 4px 6px;
   border: none;
   border-radius: var(--radius-sm);
   background: var(--card);
@@ -34,31 +34,31 @@
 .cat-btn:active::before { opacity: 1; }
 
 .cat-icon-wrap {
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
-  margin-bottom: 8px;
+  font-size: 17px;
+  margin-bottom: 6px;
   position: relative;
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
 .cat-btn .cat-name {
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--text-secondary);
 }
 
 /* ===== Records List ===== */
-#records-list { display: flex; flex-direction: column; gap: 8px; }
+#records-list { display: flex; flex-direction: column; gap: 6px; }
 
 .record-item {
   display: flex;
   align-items: center;
-  padding: 12px 16px;
+  padding: 9px 12px;
   background: var(--card);
   border-radius: var(--radius-sm);
   box-shadow: var(--card-shadow);
@@ -82,14 +82,14 @@
 .record-item:nth-child(5) { animation-delay: 0.12s; }
 
 .record-icon-wrap {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-  margin-right: 14px;
+  font-size: 14px;
+  margin-right: 10px;
   flex-shrink: 0;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
@@ -105,11 +105,11 @@
 .cat-icon-wrap.social, .record-icon-wrap.social, .report-cat-icon.social { background: linear-gradient(135deg, #FFEDD5, #FED7AA); }
 
 .record-info { flex: 1; min-width: 0; }
-.record-cat { font-weight: 600; font-size: 15px; color: var(--text); }
+.record-cat { font-weight: 600; font-size: 13px; color: var(--text); }
 .record-note {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-tertiary);
-  margin-top: 2px;
+  margin-top: 1px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -118,20 +118,20 @@
 .record-right { text-align: right; flex-shrink: 0; }
 .record-amount {
   font-weight: 700;
-  font-size: 16px;
+  font-size: 14px;
   letter-spacing: -0.3px;
   color: var(--text);
 }
 .record-time {
-  font-size: 11px;
+  font-size: 10px;
   color: var(--text-tertiary);
-  margin-top: 2px;
+  margin-top: 1px;
   font-weight: 500;
 }
 
 .date-divider {
-  padding: 14px 0 4px;
-  font-size: 12px;
+  padding: 8px 0 3px;
+  font-size: 10px;
   font-weight: 700;
   color: var(--text-secondary);
   letter-spacing: 0.5px;
@@ -141,8 +141,8 @@
 .empty-tip {
   text-align: center;
   color: var(--text-tertiary);
-  padding: 48px 20px;
-  font-size: 14px;
+  padding: 32px 16px;
+  font-size: 13px;
   line-height: 1.6;
   background: var(--card);
   border-radius: var(--radius);
@@ -181,7 +181,7 @@
   position: relative;
   background: var(--card);
   border-radius: 24px 24px 0 0;
-  padding: 20px 24px calc(24px + var(--safe-bottom));
+  padding: 16px 20px calc(18px + var(--safe-bottom));
   animation: sheetUp 0.3s var(--ease-spring);
   max-width: 500px;
   margin: 0 auto;
@@ -209,16 +209,16 @@
   height: 4px;
   border-radius: 4px;
   background: var(--border);
-  margin: 0 auto 16px;
+  margin: 0 auto 12px;
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
-.modal-header span { font-size: 16px; font-weight: 700; }
+.modal-header span { font-size: 14px; font-weight: 700; }
 
 .modal-close {
   background: var(--bg);
@@ -239,26 +239,26 @@
 /* ===== Amount Display (in modal) ===== */
 .amount-display {
   text-align: center;
-  padding: 4px 0 16px;
-  font-size: 36px;
+  padding: 2px 0 12px;
+  font-size: 30px;
   font-weight: 800;
-  letter-spacing: -1.5px;
+  letter-spacing: -1px;
   color: var(--text);
 }
 .amount-display .currency {
-  font-size: 22px;
+  font-size: 18px;
   color: var(--text-tertiary);
   margin-right: 2px;
   font-weight: 600;
   vertical-align: baseline;
 }
-#note-row { margin-bottom: 16px; }
+#note-row { margin-bottom: 12px; }
 #input-note {
   width: 100%;
   border: 2px solid var(--border);
   border-radius: var(--radius-xs);
-  padding: 12px 14px;
-  font-size: 15px;
+  padding: 10px 12px;
+  font-size: 13px;
   outline: none;
   transition: border-color 0.2s;
   background: var(--bg);
@@ -275,10 +275,10 @@
   gap: 8px;
 }
 .numpad button {
-  padding: 16px 0;
+  padding: 13px 0;
   border: none;
   border-radius: var(--radius-sm);
-  font-size: 20px;
+  font-size: 17px;
   font-weight: 600;
   background: var(--bg);
   cursor: pointer;
@@ -296,7 +296,7 @@
   grid-column: 4;
   background: var(--primary-gradient);
   color: #fff;
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 700;
   box-shadow: 0 4px 12px rgba(74, 74, 74, 0.35);
 }
@@ -305,18 +305,18 @@
   box-shadow: 0 2px 6px rgba(74, 74, 74, 0.3);
 }
 .numpad .key-del {
-  font-size: 20px;
+  font-size: 17px;
   color: var(--text-secondary);
 }
 
 /* ===== Buttons ===== */
 .btn-primary {
-  padding: 14px;
+  padding: 11px;
   border: none;
   border-radius: var(--radius-xs);
   background: var(--primary-gradient);
   color: #fff;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s;
@@ -326,15 +326,15 @@
 
 .btn-danger {
   width: 100%;
-  padding: 12px;
+  padding: 10px;
   border: none;
   border-radius: var(--radius-xs);
   background: var(--danger-light);
   color: var(--danger);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  margin-top: 12px;
+  margin-top: 10px;
   transition: all 0.15s;
 }
 .btn-danger:active { background: #FECACA; transform: scale(0.97); }
@@ -342,15 +342,15 @@
 /* ===== FAB ===== */
 .fab {
   position: fixed;
-  bottom: calc(80px + var(--safe-bottom));
-  right: calc(50% - 250px + 24px);
-  width: 52px;
-  height: 52px;
-  border-radius: 16px;
+  bottom: calc(76px + var(--safe-bottom));
+  right: calc(50% - 250px + 20px);
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
   border: none;
   background: var(--primary-gradient);
   color: #fff;
-  font-size: 26px;
+  font-size: 22px;
   cursor: pointer;
   box-shadow: 0 4px 16px rgba(74, 74, 74, 0.4);
   transition: all 0.2s var(--ease-smooth);
@@ -360,7 +360,7 @@
   justify-content: center;
 }
 .fab:active { transform: scale(0.9); box-shadow: 0 2px 8px rgba(74, 74, 74, 0.3); }
-@media (max-width: 500px) { .fab { right: 20px; } }
+@media (max-width: 500px) { .fab { right: 16px; } }
 
 /* ===== Toast ===== */
 .toast {
@@ -393,30 +393,30 @@
 
 /* ===== Delete Confirm Modal ===== */
 .delete-icon {
-  font-size: 36px;
-  margin-bottom: 12px;
+  font-size: 30px;
+  margin-bottom: 10px;
   line-height: 1;
 }
 .delete-title {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--text);
   margin-bottom: 6px;
 }
 .delete-sub {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-secondary);
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 .btn-ghost {
   width: 100%;
-  padding: 12px;
+  padding: 10px;
   margin-top: 8px;
   border: none;
   border-radius: var(--radius-xs);
   background: var(--bg);
   color: var(--text-secondary);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.15s;
@@ -428,13 +428,13 @@
   background: var(--card);
   border-radius: var(--radius);
   box-shadow: var(--card-shadow);
-  padding: 16px;
-  margin-top: 16px;
+  padding: 12px;
+  margin-top: 10px;
 }
 .chart-section .section-title { margin-bottom: 8px; }
 #asset-trend-chart {
   display: block;
   width: 100%;
-  height: 180px;
+  height: 150px;
   border-radius: var(--radius-xs);
 }

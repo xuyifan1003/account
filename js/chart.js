@@ -15,7 +15,7 @@ export function renderAssetChart() {
   const cs = getComputedStyle(container);
   const padH = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
   const w = container.clientWidth - padH;
-  const h = 180;
+  const h = 150;
 
   canvas.width = w * dpr;
   canvas.height = h * dpr;
@@ -64,7 +64,7 @@ export function renderAssetChart() {
   // Grid lines & Y labels
   ctx.textAlign = 'right';
   ctx.textBaseline = 'middle';
-  ctx.font = '11px -apple-system, sans-serif';
+  ctx.font = '10px -apple-system, sans-serif';
 
   for (let v = niceMin; v <= niceMax + 0.01; v += niceStep) {
     const y = yPos(v);
@@ -124,7 +124,7 @@ export function renderAssetChart() {
   ctx.textAlign = 'center';
   ctx.textBaseline = 'top';
   ctx.fillStyle = muted;
-  ctx.font = '11px -apple-system, sans-serif';
+  ctx.font = '10px -apple-system, sans-serif';
 
   const maxLabels = Math.max(2, Math.min(data.length, Math.floor(cw / 55)));
   const step = data.length > 1 ? Math.max(1, Math.floor((data.length - 1) / (maxLabels - 1))) : 1;

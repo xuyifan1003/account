@@ -49,8 +49,9 @@ DOMContentLoaded → initTabs → initBook → initAssets → initReport
 - All tokens in `variables.css` CSS custom properties. `--primary` = `#4A4A4A`
 - Mobile-first, max-width 500px, safe-area-inset
 
-## SW cache (network-first)
-- Cache name in `sw.js:1` — **每次部署必须 bump**（如 `v20` → `v21`）
+## SW cache (network-first, 无需 bump)
+- 缓存名固定 `money-book`（`sw.js:1`），**不要带版本号、每次部署不用 bump** — 所有 GET 请求走真 network-first：在线先取网络并回写缓存，离线才落到缓存，改动即时生效
+- 若将来要强制全量刷新，改 `sw.js` 里 `URLS` 或让 `activate` 清旧缓存即可
 - PRECACHE list in `sw.js` must match actual files
 - `clients.claim()` on activate → new SW takes over immediately
 
