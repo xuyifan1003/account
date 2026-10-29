@@ -229,6 +229,12 @@
 .modal-close::after { content: ''; position: absolute; inset: -7px; }
 
 /* ===== Edit Sheet Rows (date / delete) ===== */
+.modal-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
 .sheet-row {
   position: relative;
   display: flex;
@@ -237,7 +243,7 @@
   gap: 4px;
   padding: 9px 12px;
   margin-bottom: 10px;
-  background: var(--bg);
+  background: var(--card);
   border-radius: var(--radius-xs);
   font-size: 13px;
   font-weight: 600;
@@ -260,17 +266,18 @@
   appearance: none;
 }
 .sheet-delete-btn {
-  width: 100%;
-  padding: 7px;
-  margin-bottom: 10px;
+  position: relative;
+  padding: 10px 10px;
   background: none;
   border: none;
   color: var(--danger);
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
+  line-height: 1;
 }
+.sheet-delete-btn::after { content: ''; position: absolute; inset: -4px; }
 .sheet-delete-btn:active { opacity: 0.55; }
 
 /* ===== Amount Display (in modal) ===== */
@@ -446,14 +453,12 @@
 
 /* ===== Export Row ===== */
 .export-row {
-  margin-top: 4px;
-  padding: 11px;
+  margin: 14px 0 2px;
+  padding: 10px;
   text-align: center;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-tertiary);
-  border: 1px dashed var(--border);
-  border-radius: var(--radius-sm);
   cursor: pointer;
   transition: color 0.2s;
 }
