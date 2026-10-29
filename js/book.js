@@ -277,7 +277,7 @@ function renderSyncDot() {
   const dot = document.getElementById('sync-dot');
   if (!dot) return;
   const st = getSyncStatus();
-  dot.classList.toggle('pending', !st.online || st.pending > 0);
+  dot.classList.toggle('pending', !st.online || st.pending > 0 || st.refreshFailed);
 }
 
 /* ===== Init Book Module ===== */
@@ -360,6 +360,7 @@ export function initBook() {
     const st = getSyncStatus();
     if (!st.online) showToast(st.pending ? `离线，${st.pending} 条待同步` : '当前离线');
     else if (st.pending) showToast(`${st.pending} 条待同步…`);
+    else if (st.refreshFailed) showToast('上次刷新失败，当前显示本地数据');
     else showToast('✓ 已全部同步');
   });
   window.addEventListener('online', renderSyncDot);

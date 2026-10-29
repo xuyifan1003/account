@@ -1,5 +1,5 @@
 import { api } from './db.js';
-import { showToast, getToday } from './utils.js';
+import { getToday } from './utils.js';
 
 /* ===== Categories & Default Assets ===== */
 export const CATEGORIES = [
@@ -45,7 +45,22 @@ function savePendingOps(p) {
 
 export function getSyncStatus() {
   const p = loadPendingOps();
-  return { online: navigator.onLine, pending: p.deletes.length + p.updates.length };
+  return { online: navigator.onLine, pending: p.deletes.length + p.updates.length, refreshFailed: _lastFetchFailed };
+}
+
+export function hasCachedState() {
+  try {
+    const raw = localStorage.getItem(STATE_KEY);
+    if (!raw) return false;
+    const d = JSON.parse(raw);
+    return !!(d && d.records);
+  } catch (e) { return false; }
+}
+
+/* 离线冷启动：只从缓存初始化内存状态（initState 仅在联网时调用） */
+export function initStateFromCache() {
+  if (!state) loadCachedState();
+  window.dispatchEvent(new Event('money-sync-status'));
 }
 
 function removePending(kind, id) {
@@ -129,6 +144,7 @@ function saveCachedState() {
 
 /* ===== State Management ===== */
 let state = null;
+let _lastFetchFailed = false;
 
 function mapAssetFromDb(a) {
   return { id: a.id, name: a.name, icon: a.icon, iconClass: a.icon_class, balance: a.balance, sort: a.sort };
@@ -187,9 +203,13 @@ export function initState() {
 
       saveCachedState();
       syncPendingOps();
+      _lastFetchFailed = false;
+      window.dispatchEvent(new Event('money-sync-status'));
     } catch(e) {
       console.warn('Supabase read failed:', e);
       if (!state) state = { records: [], assets: JSON.parse(JSON.stringify(DEFAULT_ASSETS)), snapshots: [] };
+      _lastFetchFailed = true;
+      window.dispatchEvent(new Event('money-sync-status'));
       throw e;
     }
   })();
@@ -217,7 +237,7 @@ export function saveState() {
     api('POST', 'records', state.records.map(normalizeRecord), 'on_conflict=id').catch(e => warn('save records:', e)),
     api('POST', 'assets', state.assets.map(mapAssetToDb), 'on_conflict=id').catch(e => warn('save assets:', e)),
   ]).then(() => {
-    if (failed) showToast('同步失败，请检查网络');
+    if (failed) console.warn('saveState: 同步失败（数据在本地缓存中，联网后由状态灯/补拉兜底）');
   }).catch(() => {});
 }
 
