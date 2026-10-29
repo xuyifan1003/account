@@ -1,4 +1,4 @@
-import { CATEGORIES, getState, saveState, getCategory, deleteRecordLocally, markRecordUpdated } from './state.js';
+import { CATEGORIES, getState, saveState, getCategory, deleteRecordLocally, markRecordUpdated, getSyncStatus } from './state.js';
 import { getToday, getNow, formatMoney, genId, showToast, shakeElement, haptic } from './utils.js';
 
 /* ===== Modal State ===== */
@@ -272,6 +272,14 @@ function updateAmountDisplay() {
   document.getElementById('amount-value').textContent = modalAmount;
 }
 
+/* ===== Sync Status Dot ===== */
+function renderSyncDot() {
+  const dot = document.getElementById('sync-dot');
+  if (!dot) return;
+  const st = getSyncStatus();
+  dot.classList.toggle('pending', !st.online || st.pending > 0);
+}
+
 /* ===== Init Book Module ===== */
 export function initBook() {
   renderCategories();
@@ -344,6 +352,19 @@ export function initBook() {
   window.addEventListener('popstate', () => {
     _closeModalWithAnim(document.getElementById('amount-modal'));
   });
+
+  // Sync status dot: tap for detail
+  renderSyncDot();
+  document.getElementById('sync-dot').addEventListener('click', () => {
+    haptic();
+    const st = getSyncStatus();
+    if (!st.online) showToast(st.pending ? `离线，${st.pending} 条待同步` : '当前离线');
+    else if (st.pending) showToast(`${st.pending} 条待同步…`);
+    else showToast('✓ 已全部同步');
+  });
+  window.addEventListener('online', renderSyncDot);
+  window.addEventListener('offline', renderSyncDot);
+  window.addEventListener('money-sync-status', renderSyncDot);
 
   // Auto-refresh on month rollover only
   let _monthKey = null;

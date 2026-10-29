@@ -38,6 +38,19 @@
   position: relative;
   letter-spacing: 1px;
 }
+
+/* ===== Sync Status Dot ===== */
+.sync-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--success);
+  margin-left: 6px;
+  vertical-align: 1px;
+  transition: background 0.3s;
+}
+.sync-dot.pending { background: var(--text-tertiary); }
 .summary-card .summary-amount {
   font-size: 26px;
   font-weight: 800;

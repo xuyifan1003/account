@@ -39,6 +39,13 @@ function loadPendingOps() {
 
 function savePendingOps(p) {
   try { localStorage.setItem(PENDING_KEY, JSON.stringify(p)); } catch (e) { /* ignore */ }
+  // 通知 UI 更新同步状态灯
+  window.dispatchEvent(new Event('money-sync-status'));
+}
+
+export function getSyncStatus() {
+  const p = loadPendingOps();
+  return { online: navigator.onLine, pending: p.deletes.length + p.updates.length };
 }
 
 function removePending(kind, id) {
@@ -74,7 +81,10 @@ export function syncPendingOps() {
         .catch(() => {})
     );
   }
-  Promise.all(tasks).catch(() => {}).finally(() => { _syncing = false; });
+  Promise.all(tasks).catch(() => {}).finally(() => {
+    _syncing = false;
+    window.dispatchEvent(new Event('money-sync-status'));
+  });
 }
 
 export function deleteRecordLocally(id) {
