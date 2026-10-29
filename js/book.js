@@ -1,9 +1,9 @@
-import { CATEGORIES, getState, saveState, getCategory } from './state.js';
+import { CATEGORIES, getState, saveState, getCategory, deleteRecordLocally, markRecordUpdated } from './state.js';
 import { getToday, getNow, formatMoney, genId, showToast, shakeElement, haptic } from './utils.js';
-import { api } from './db.js';
 
 /* ===== Modal State ===== */
 let selectedCategory = null;
+let editingId = null;
 let deletingId = null;
 let modalAmount = '0';
 let modalHasDecimal = false;
@@ -41,8 +41,12 @@ export function renderCategories() {
   });
 }
 
-/* ===== Records List ===== */
-export function renderRecords() {
+/* ===== Records List =====
+ * opts.animateAll: 进页面/翻月时整体阶梯入场动画
+ * opts.newId: 新增记录后只让新条目做入场动画，其余静默
+ */
+export function renderRecords(opts = {}) {
+  const { animateAll = false, newId = null } = opts;
   const container = document.getElementById('records-list');
   const now = new Date();
   const monthPrefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -69,8 +73,10 @@ export function renderRecords() {
     html += `<div class="date-divider">${label}</div>`;
     records.forEach(r => {
       const cat = getCategory(r.category);
+      const enterCls = (animateAll || r.id === newId) ? ' enter' : '';
+      const delayStyle = animateAll ? ` style="animation-delay:${Math.min(itemIndex, 8) * 0.03}s"` : '';
       html += `
-        <div class="record-item" data-id="${r.id}" style="animation-delay:${itemIndex * 0.03}s">
+        <div class="record-item${enterCls}" data-id="${r.id}"${delayStyle}>
           <div class="record-icon-wrap ${r.category}">${cat.icon}</div>
           <div class="record-info">
             <div class="record-cat">${cat.name}</div>
@@ -97,11 +103,38 @@ function _preventEdgeSwipe(e) {
   }
 }
 
-function openAmountModal(catId) {
+function openAmountModal(catId, recordId = null) {
   const cat = getCategory(catId);
+  const record = recordId ? getState().records.find(r => r.id === recordId) : null;
+  if (recordId && !record) return;
+  editingId = recordId;
+  selectedCategory = catId;
+
   document.getElementById('modal-category-name').textContent = cat.icon + ' ' + cat.name;
-  document.getElementById('amount-value').textContent = '0';
-  document.getElementById('input-note').value = '';
+
+  const dateRow = document.getElementById('date-row');
+  const delBtn = document.getElementById('edit-delete');
+  const dateInput = document.getElementById('edit-date-input');
+  if (record) {
+    // 编辑模式：预填金额、日期，显示删除入口
+    const s = String(record.amount);
+    modalAmount = s;
+    modalHasDecimal = s.includes('.');
+    modalDecimalDigits = modalHasDecimal ? s.split('.')[1].length : 0;
+    dateRow.classList.remove('hidden');
+    delBtn.classList.remove('hidden');
+    dateInput.value = record.date;
+    dateInput.max = getToday();
+    document.getElementById('edit-date-value').textContent = record.date;
+  } else {
+    modalAmount = '0';
+    modalHasDecimal = false;
+    modalDecimalDigits = 0;
+    dateRow.classList.add('hidden');
+    delBtn.classList.add('hidden');
+  }
+  updateAmountDisplay();
+
   const modal = document.getElementById('amount-modal');
   modal.querySelector('.modal-overlay').classList.remove('closing');
   modal.querySelector('.modal-content').classList.remove('closing');
@@ -111,9 +144,18 @@ function openAmountModal(catId) {
   document.addEventListener('touchstart', _preventEdgeSwipe, { passive: false, capture: true });
   document.addEventListener('touchmove', _preventEdgeSwipe, { passive: false, capture: true });
   history.pushState({ modal: true }, '');
-  modalAmount = '0';
-  modalHasDecimal = false;
-  modalDecimalDigits = 0;
+}
+
+function _cleanupModal(modalEl) {
+  modalEl.classList.add('hidden');
+  const overlay = modalEl.querySelector('.modal-overlay');
+  const content = modalEl.querySelector('.modal-content');
+  overlay.classList.remove('closing');
+  content.classList.remove('closing');
+  document.documentElement.style.overscrollBehaviorX = '';
+  document.documentElement.style.touchAction = '';
+  document.removeEventListener('touchstart', _preventEdgeSwipe, true);
+  document.removeEventListener('touchmove', _preventEdgeSwipe, true);
 }
 
 function _closeModalWithAnim(modalEl) {
@@ -124,18 +166,15 @@ function _closeModalWithAnim(modalEl) {
   overlay.classList.add('closing');
   content.classList.add('closing');
   content.addEventListener('animationend', () => {
-    modalEl.classList.add('hidden');
-    overlay.classList.remove('closing');
-    content.classList.remove('closing');
-    document.documentElement.style.overscrollBehaviorX = '';
-    document.documentElement.style.touchAction = '';
-    document.removeEventListener('touchstart', _preventEdgeSwipe, true);
-    document.removeEventListener('touchmove', _preventEdgeSwipe, true);
+    _cleanupModal(modalEl);
   }, { once: true });
 }
 
-function closeAmountModal() {
-  _closeModalWithAnim(document.getElementById('amount-modal'));
+function closeAmountModal(instant = false) {
+  const modal = document.getElementById('amount-modal');
+  if (instant) _cleanupModal(modal);
+  else _closeModalWithAnim(modal);
+  editingId = null;
   if (history.state?.modal) history.back();
 }
 
@@ -150,20 +189,37 @@ function handleNumpad(key) {
     }
     if (!selectedCategory) return;
 
-    const cat = getCategory(selectedCategory);
     const state = getState();
+
+    if (editingId) {
+      // 编辑模式：更新金额与日期
+      const record = state.records.find(r => r.id === editingId);
+      if (!record) return;
+      record.amount = val;
+      const d = document.getElementById('edit-date-input').value;
+      if (d) record.date = d;
+      markRecordUpdated(record.id);
+      closeAmountModal();
+      renderRecords();
+      renderBookSummary();
+      showToast(`✓ 已修改 ${formatMoney(val)} 元`);
+      return;
+    }
+
+    const cat = getCategory(selectedCategory);
+    const id = genId();
     state.records.unshift({
-      id: genId(),
+      id,
       category: selectedCategory,
       amount: val,
-      note: document.getElementById('input-note').value.trim(),
+      note: '',
       date: getToday(),
       time: getNow(),
       type: cat.type,
     });
     saveState();
     closeAmountModal();
-    renderRecords();
+    renderRecords({ newId: id });
     renderBookSummary();
     showToast(`✓ ${cat.name} ${formatMoney(val)} 元`);
     return;
@@ -219,71 +275,53 @@ function updateAmountDisplay() {
 /* ===== Init Book Module ===== */
 export function initBook() {
   renderCategories();
-  renderRecords();
+  renderRecords({ animateAll: true });
 
-  // Long press on record items → delete
-  let lpTimer = null;
-  let lpItem = null;
+  // Click record item → edit modal (amount / date / delete)
   const list = document.getElementById('records-list');
-
-  function clearLp() {
-    clearTimeout(lpTimer);
-    if (lpItem) { lpItem.classList.remove('pressing'); lpItem = null; }
-  }
-
-  list.addEventListener('pointerdown', e => {
-    clearLp();
+  list.addEventListener('click', e => {
     const item = e.target.closest('.record-item');
     if (!item) return;
     const id = item.dataset.id;
-    if (!id) return;
-    lpItem = item;
-    item.classList.add('pressing');
-    lpTimer = setTimeout(() => {
-      item.classList.remove('pressing');
-      lpItem = null;
-      const record = getState().records.find(r => r.id === id);
-      if (!record) return;
-      deletingId = id;
-      const cat = getCategory(record.category);
-      document.getElementById('delete-modal-text').textContent =
-        `${cat.icon} ${cat.name}  ¥${formatMoney(record.amount)}`;
-      document.getElementById('delete-modal').classList.remove('hidden');
-    }, 500);
+    const record = getState().records.find(r => r.id === id);
+    if (!record) return;
+    haptic();
+    openAmountModal(record.category, record.id);
   });
-  list.addEventListener('pointermove', clearLp);
-  list.addEventListener('pointerup', clearLp);
-  list.addEventListener('pointercancel', clearLp);
-  list.addEventListener('pointerleave', clearLp);
+
+  // Edit modal: delete button → instant close, then show confirm modal
+  document.getElementById('edit-delete').addEventListener('click', () => {
+    if (!editingId) return;
+    const record = getState().records.find(r => r.id === editingId);
+    if (!record) return;
+    const cat = getCategory(record.category);
+    deletingId = record.id;
+    document.getElementById('delete-modal-text').textContent =
+      `${cat.icon} ${cat.name}  ¥${formatMoney(record.amount)}`;
+    closeAmountModal(true);
+    document.getElementById('delete-modal').classList.remove('hidden');
+  });
 
   // Delete confirm
   function closeDelete() {
     document.getElementById('delete-modal').classList.add('hidden');
     deletingId = null;
   }
-  document.getElementById('delete-confirm').addEventListener('click', async () => {
+  document.getElementById('delete-confirm').addEventListener('click', () => {
     if (!deletingId) return;
     const id = deletingId;
     deletingId = null;
-    try {
-      await api('DELETE', 'records', null, `id=eq.${id}`);
-      const state = getState();
-      state.records = state.records.filter(r => r.id !== id);
-      saveState();
-      closeDelete();
-      renderRecords();
-      renderBookSummary();
-      showToast('已删除');
-    } catch (e) {
-      showToast('删除失败，请检查网络');
-      closeDelete();
-    }
+    deleteRecordLocally(id);
+    closeDelete();
+    renderRecords();
+    renderBookSummary();
+    showToast('已删除');
   });
   document.getElementById('delete-cancel').addEventListener('click', closeDelete);
   document.querySelector('#delete-modal .modal-overlay').addEventListener('click', closeDelete);
 
   // Numpad
-  document.querySelectorAll('.numpad button').forEach(btn => {
+  document.querySelectorAll('#amount-modal .numpad button').forEach(btn => {
     if (btn.dataset.key === 'del') {
       let repeatTimer = null;
       const stop = () => clearInterval(repeatTimer);
@@ -301,8 +339,8 @@ export function initBook() {
   });
 
   // Modal close
-  document.getElementById('modal-close').addEventListener('click', closeAmountModal);
-  document.querySelector('#amount-modal .modal-overlay').addEventListener('click', closeAmountModal);
+  document.getElementById('modal-close').addEventListener('click', () => closeAmountModal());
+  document.querySelector('#amount-modal .modal-overlay').addEventListener('click', () => closeAmountModal());
   window.addEventListener('popstate', () => {
     _closeModalWithAnim(document.getElementById('amount-modal'));
   });

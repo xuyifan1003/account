@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#F0F2F6">
-<link rel="icon" type="image/png" sizes="192x192" href="icon.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon.png">
 <link rel="manifest" href="manifest.json">
 <title>记账</title>
 <link rel="stylesheet" href="css/variables.css">
@@ -46,6 +46,7 @@
       <div class="summary-amount" id="total-assets">0.00</div>
     </div>
     <div id="assets-list"></div>
+    <div id="export-row">↓ 导出数据备份</div>
     <div id="asset-chart-container" class="chart-section">
       <canvas id="asset-trend-chart"></canvas>
     </div>
@@ -115,9 +116,12 @@
       <span class="currency">¥</span>
       <span id="amount-value">0</span>
     </div>
-    <div id="note-row">
-      <input type="text" id="input-note" placeholder="添加备注..." maxlength="20">
+    <div id="date-row" class="sheet-row hidden">
+      <span id="edit-date-value">2026-10-29</span>
+      <span class="date-arrow">›</span>
+      <input type="date" id="edit-date-input">
     </div>
+    <button id="edit-delete" class="sheet-delete-btn hidden">删除这条记录</button>
     <div class="numpad">
       <button data-key="1">1</button><button data-key="2">2</button><button data-key="3">3</button><button class="key-del" data-key="del">⌫</button>
       <button class="key-confirm" data-key="confirm">✓</button>

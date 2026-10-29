@@ -131,6 +131,7 @@
   margin-bottom: 12px;
 }
 .report-nav .nav-btn {
+  position: relative;
   background: var(--card);
   border: none;
   border-radius: 50%;
@@ -147,6 +148,7 @@
   box-shadow: var(--card-shadow);
   transition: all 0.15s;
 }
+.report-nav .nav-btn::after { content: ''; position: absolute; inset: -7px; }
 .report-nav .nav-btn:active { transform: scale(0.9); background: var(--border); }
 .report-nav .nav-label {
   font-size: 14px;

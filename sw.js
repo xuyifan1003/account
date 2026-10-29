@@ -49,13 +49,15 @@ self.addEventListener('fetch', e => {
     return;
   }
 
+  // App shell: stale-while-revalidate — 命中缓存立即返回（秒开），后台静默更新缓存供下次打开使用
   e.respondWith(
-    fetch(r).then(res => {
-      if (res && res.ok) {
-        const clone = res.clone();
-        caches.open(CACHE).then(c => c.put(r, clone));
-      }
-      return res;
-    }).catch(() => caches.match(r))
+    caches.open(CACHE).then(async cache => {
+      const cached = await cache.match(r);
+      const network = fetch(r).then(res => {
+        if (res && res.ok) cache.put(r, res.clone());
+        return res;
+      }).catch(() => cached);
+      return cached || network;
+    })
   );
 });

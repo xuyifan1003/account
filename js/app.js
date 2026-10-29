@@ -1,4 +1,4 @@
-import { initState } from './state.js';
+import { initState, syncPendingOps } from './state.js';
 import { initTabs } from './tabs.js';
 import { initBook, renderRecords, renderBookSummary } from './book.js';
 import { initAssets, renderAssets } from './assets.js';
@@ -16,7 +16,7 @@ async function init() {
     const remotePromise = initState();
 
     renderBookSummary();
-    renderRecords();
+    renderRecords({ animateAll: true });
     renderAssets();
 
     try {
@@ -29,10 +29,13 @@ async function init() {
     }
   } else {
     renderBookSummary();
-    renderRecords();
+    renderRecords({ animateAll: true });
     renderAssets();
     showToast('网络错误，请检查网络连接');
   }
+
+  // 网络恢复时补同步离线期间的删除/修改
+  window.addEventListener('online', syncPendingOps);
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(() => {});

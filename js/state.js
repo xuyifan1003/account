@@ -25,6 +25,76 @@ const DEFAULT_ASSETS = [
   { id:'asset-gold', name:'黄金', icon:'🥇', iconClass:'gold', balance:0, sort:6 },
 ];
 
+/* ===== Pending Ops (offline delete/update queue) ===== */
+const PENDING_KEY = 'money-book-pending-ops';
+
+function loadPendingOps() {
+  try {
+    const raw = localStorage.getItem(PENDING_KEY);
+    const data = raw ? JSON.parse(raw) : null;
+    if (data && Array.isArray(data.deletes) && Array.isArray(data.updates)) return data;
+  } catch (e) { /* ignore */ }
+  return { deletes: [], updates: [] };
+}
+
+function savePendingOps(p) {
+  try { localStorage.setItem(PENDING_KEY, JSON.stringify(p)); } catch (e) { /* ignore */ }
+}
+
+function removePending(kind, id) {
+  const p = loadPendingOps();
+  p[kind] = p[kind].filter(x => x !== id);
+  savePendingOps(p);
+}
+
+let _syncing = false;
+
+export function syncPendingOps() {
+  if (_syncing || !navigator.onLine) return;
+  const pending = loadPendingOps();
+  if (!pending.deletes.length && !pending.updates.length) return;
+
+  const state = getState();
+  // 更新队列里已不存在的记录（后来被删了）直接出队
+  pending.updates = pending.updates.filter(id => state.records.some(r => r.id === id));
+  savePendingOps(pending);
+  if (!pending.deletes.length && !pending.updates.length) return;
+
+  _syncing = true;
+  const tasks = pending.deletes.map(id =>
+    api('DELETE', 'records', null, `id=eq.${id}`)
+      .then(() => removePending('deletes', id))
+      .catch(() => {})
+  );
+  const updRecords = state.records.filter(r => pending.updates.includes(r.id)).map(normalizeRecord);
+  if (updRecords.length) {
+    tasks.push(
+      api('POST', 'records', updRecords, 'on_conflict=id')
+        .then(() => pending.updates.forEach(id => removePending('updates', id)))
+        .catch(() => {})
+    );
+  }
+  Promise.all(tasks).catch(() => {}).finally(() => { _syncing = false; });
+}
+
+export function deleteRecordLocally(id) {
+  const state = getState();
+  state.records = state.records.filter(r => r.id !== id);
+  const p = loadPendingOps();
+  if (!p.deletes.includes(id)) p.deletes.push(id);
+  savePendingOps(p);
+  saveCachedState();
+  syncPendingOps();
+}
+
+export function markRecordUpdated(id) {
+  const p = loadPendingOps();
+  if (!p.updates.includes(id)) p.updates.push(id);
+  savePendingOps(p);
+  saveCachedState();
+  syncPendingOps();
+}
+
 /* ===== Cache ===== */
 const STATE_KEY = 'money-book-state-v1';
 
@@ -74,11 +144,20 @@ export function initState() {
       const snap = snapshots.map(s => ({ id: s.id, total_balance: s.total_balance, date: s.date }));
 
       // 合并本地已有记录，避免覆盖用户在 initState 完成前添加的数据
-      let records = serverRecords;
+      // 待删记录从服务端结果中剔除，防止离线删除后复活；待更新记录以本地版本为准
+      const pending = loadPendingOps();
+      let records = serverRecords.filter(r => !pending.deletes.includes(r.id));
       if (state && state.records.length > 0) {
-        const serverIds = new Set(serverRecords.map(r => r.id));
+        const serverIds = new Set(records.map(r => r.id));
         const localOnly = state.records.filter(r => !serverIds.has(r.id));
-        records = [...localOnly, ...serverRecords];
+        records = [...localOnly, ...records];
+        if (pending.updates.length) {
+          records = records.map(r =>
+            pending.updates.includes(r.id)
+              ? (state.records.find(l => l.id === r.id) || r)
+              : r
+          );
+        }
       }
 
       // 迁移旧分类：数码/通讯 → 日用
@@ -97,6 +176,7 @@ export function initState() {
       }
 
       saveCachedState();
+      syncPendingOps();
     } catch(e) {
       console.warn('Supabase read failed:', e);
       if (!state) state = { records: [], assets: JSON.parse(JSON.stringify(DEFAULT_ASSETS)), snapshots: [] };

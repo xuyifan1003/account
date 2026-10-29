@@ -1,5 +1,5 @@
 import { getState, saveState, saveSnapshot } from './state.js';
-import { formatMoney, showToast, shakeElement, haptic } from './utils.js';
+import { formatMoney, getToday, showToast, shakeElement, haptic } from './utils.js';
 import { renderAssetChart } from './chart.js';
 
 let editingAssetId = null;
@@ -168,10 +168,33 @@ export function resetAssetsVisibility() {
   renderAssets();
 }
 
+/* ===== Export Data ===== */
+function exportData() {
+  haptic();
+  const state = getState();
+  const data = {
+    exported_at: new Date().toISOString(),
+    records: state.records,
+    assets: state.assets,
+    snapshots: state.snapshots,
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `记账备份-${getToday()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  showToast('✓ 已导出备份文件');
+}
+
 /* ===== Init ===== */
 export function initAssets() {
   renderAssets();
   document.querySelector('#page-assets .summary-card').addEventListener('click', toggleAssets);
+  document.getElementById('export-row').addEventListener('click', exportData);
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible' && document.getElementById('page-assets').classList.contains('active')) {
       resetAssetsVisibility();
