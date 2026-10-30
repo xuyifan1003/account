@@ -1,4 +1,4 @@
-import { getState, saveState, saveSnapshot } from './state.js';
+import { getState, saveSnapshot, markAssetsDirty } from './state.js';
 import { formatMoney, getToday, showToast, shakeElement, haptic } from './utils.js';
 import { renderAssetChart } from './chart.js';
 
@@ -105,8 +105,9 @@ function handleAssetNumpad(key) {
     const asset = state.assets.find(a => a.id === editingAssetId);
     if (!asset) return;
     asset.balance = val;
-    saveState();
     saveSnapshot();
+    // 资产更新入队：断网/秒退不丢，联网补传（与记账同款机制）
+    markAssetsDirty();
     closeAssetModal();
     renderAssets();
     showToast(`✓ ${asset.name} ¥${formatMoney(val)}`);

@@ -34,13 +34,13 @@ async function tryRefresh() {
 
 /* ===== App Entry ===== */
 async function init() {
+  // 先恢复缓存，再初始化各页面——保证首屏渲染时数据已在内存
+  initStateFromCache();
   initTabs();
   initBook();
   initAssets();
   initReport();
 
-  // 无论在线离线，先用缓存初始化（修复离线冷启动显示空列表的问题）
-  initStateFromCache();
   renderBookSummary();
   renderRecords({ animateAll: true });
   renderAssets();

@@ -32,9 +32,12 @@ function loadPendingOps() {
   try {
     const raw = localStorage.getItem(PENDING_KEY);
     const data = raw ? JSON.parse(raw) : null;
-    if (data && Array.isArray(data.deletes) && Array.isArray(data.updates)) return data;
+    if (data && Array.isArray(data.deletes) && Array.isArray(data.updates)) {
+      data.assetSync = data.assetSync === true;
+      return data;
+    }
   } catch (e) { /* ignore */ }
-  return { deletes: [], updates: [] };
+  return { deletes: [], updates: [], assetSync: false };
 }
 
 function savePendingOps(p) {
@@ -45,7 +48,11 @@ function savePendingOps(p) {
 
 export function getSyncStatus() {
   const p = loadPendingOps();
-  return { online: navigator.onLine, pending: p.deletes.length + p.updates.length, refreshFailed: _lastFetchFailed };
+  return {
+    online: navigator.onLine,
+    pending: p.deletes.length + p.updates.length + (p.assetSync ? 1 : 0),
+    refreshFailed: _lastFetchFailed,
+  };
 }
 
 export function hasCachedState() {
@@ -59,7 +66,7 @@ export function hasCachedState() {
 
 /* 离线冷启动：只从缓存初始化内存状态（initState 仅在联网时调用） */
 export function initStateFromCache() {
-  if (!state) loadCachedState();
+  if (!_cacheLoaded) loadCachedState();
   window.dispatchEvent(new Event('money-sync-status'));
 }
 
@@ -74,13 +81,13 @@ let _syncing = false;
 export function syncPendingOps() {
   if (_syncing || !navigator.onLine) return;
   const pending = loadPendingOps();
-  if (!pending.deletes.length && !pending.updates.length) return;
+  if (!pending.deletes.length && !pending.updates.length && !pending.assetSync) return;
 
   const state = getState();
   // 更新队列里已不存在的记录（后来被删了）直接出队
   pending.updates = pending.updates.filter(id => state.records.some(r => r.id === id));
   savePendingOps(pending);
-  if (!pending.deletes.length && !pending.updates.length) return;
+  if (!pending.deletes.length && !pending.updates.length && !pending.assetSync) return;
 
   _syncing = true;
   const tasks = pending.deletes.map(id =>
@@ -96,9 +103,25 @@ export function syncPendingOps() {
         .catch(() => {})
     );
   }
+  if (pending.assetSync) {
+    tasks.push(
+      Promise.all([
+        api('POST', 'assets', state.assets.map(mapAssetToDb), 'on_conflict=id'),
+        api('POST', 'asset_snapshots', state.snapshots.map(s => ({ id: s.id, total_balance: s.total_balance, date: s.date })), 'on_conflict=id'),
+      ]).then(() => {
+        const q = loadPendingOps();
+        if (q.assetSync) { q.assetSync = false; savePendingOps(q); }
+      }).catch(() => {})
+    );
+  }
   Promise.all(tasks).catch(() => {}).finally(() => {
     _syncing = false;
     window.dispatchEvent(new Event('money-sync-status'));
+    // 同步期间又有新操作入队的话，稍后自动补一轮
+    const p = loadPendingOps();
+    if ((p.deletes.length || p.updates.length || p.assetSync) && navigator.onLine) {
+      setTimeout(() => syncPendingOps(), 2000);
+    }
   });
 }
 
@@ -120,8 +143,18 @@ export function markRecordUpdated(id) {
   syncPendingOps();
 }
 
+/* 资产/快照有未同步的本地更新（离线或早退时置位，联网补传） */
+export function markAssetsDirty() {
+  const p = loadPendingOps();
+  p.assetSync = true;
+  savePendingOps(p);
+  saveCachedState();
+  syncPendingOps();
+}
+
 /* ===== Cache ===== */
 const STATE_KEY = 'money-book-state-v1';
+let _cacheLoaded = false;
 
 function loadCachedState() {
   try {
@@ -130,6 +163,7 @@ function loadCachedState() {
       const data = JSON.parse(raw);
       if (data && data.records && data.assets) {
         state = data;
+        _cacheLoaded = true;
         return true;
       }
     }
@@ -165,18 +199,31 @@ export function initState() {
         api('GET', 'asset_snapshots', null, 'order=date.asc').catch(() => []),
       ]);
 
-      const assets = assetsData.length ? assetsData.map(mapAssetFromDb)
-        : JSON.parse(JSON.stringify(DEFAULT_ASSETS));
-      const snap = snapshots.map(s => ({ id: s.id, total_balance: s.total_balance, date: s.date }));
+      const pending = loadPendingOps();
+      // 资产有未同步的本地更新时，以本地为准（离线/早退更新防覆盖）
+      const assets = (!pending.assetSync && assetsData.length) ? assetsData.map(mapAssetFromDb)
+        : (state && state.assets.length ? state.assets : JSON.parse(JSON.stringify(DEFAULT_ASSETS)));
+      let snap = snapshots.map(s => ({ id: s.id, total_balance: s.total_balance, date: s.date }));
+      if (pending.assetSync && state) {
+        // 本地快照按 id 合并覆盖，离线快照不丢
+        const byId = new Map(snap.map(s => [s.id, s]));
+        for (const s of state.snapshots) byId.set(s.id, { id: s.id, total_balance: s.total_balance, date: s.date });
+        snap = [...byId.values()].sort((a, b) => a.date.localeCompare(b.date));
+      }
 
       // 合并本地已有记录，避免覆盖用户在 initState 完成前添加的数据
       // 待删记录从服务端结果中剔除，防止离线删除后复活；待更新记录以本地版本为准
-      const pending = loadPendingOps();
       let records = serverRecords.filter(r => !pending.deletes.includes(r.id));
       if (state && state.records.length > 0) {
         const serverIds = new Set(records.map(r => r.id));
         const localOnly = state.records.filter(r => !serverIds.has(r.id));
         records = [...localOnly, ...records];
+        // 本地独有记录 = 尚未上服务器的（离线/早退新增），自动入队补传
+        let queued = false;
+        for (const r of localOnly) {
+          if (!pending.updates.includes(r.id)) { pending.updates.push(r.id); queued = true; }
+        }
+        if (queued) savePendingOps(pending);
         if (pending.updates.length) {
           records = records.map(r =>
             pending.updates.includes(r.id)

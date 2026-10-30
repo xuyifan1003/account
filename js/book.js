@@ -1,4 +1,4 @@
-import { CATEGORIES, getState, saveState, getCategory, deleteRecordLocally, markRecordUpdated, getSyncStatus } from './state.js';
+import { CATEGORIES, getState, getCategory, deleteRecordLocally, markRecordUpdated, getSyncStatus } from './state.js';
 import { getToday, getNow, formatMoney, genId, showToast, shakeElement, haptic } from './utils.js';
 
 /* ===== Modal State ===== */
@@ -217,7 +217,8 @@ function handleNumpad(key) {
       time: getNow(),
       type: cat.type,
     });
-    saveState();
+    // 新增入队定向补传：联网秒同步，断网挂队列，早退不丢
+    markRecordUpdated(id);
     closeAmountModal();
     renderRecords({ newId: id });
     renderBookSummary();
