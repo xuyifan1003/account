@@ -124,7 +124,7 @@ export function renderAssetChart() {
     });
   }
 
-  // X labels: "YY.MM" 抽稀，最多 8 个，首尾必显示
+  // X labels: "YY.MM" 抽稀，最多 8 个，首尾必显示；同一个月只显示一个标签
   ctx.textAlign = 'center';
   ctx.textBaseline = 'top';
   ctx.fillStyle = muted;
@@ -134,7 +134,11 @@ export function renderAssetChart() {
   const shown = new Set();
   for (let i = 0; i < n; i += labelStep) shown.add(i);
   shown.add(n - 1);
+  let lastMonth = '';
   [...shown].sort((a, b) => a - b).forEach(i => {
+    const mk = data[i].date.slice(0, 7);
+    if (mk === lastMonth) return;
+    lastMonth = mk;
     ctx.fillText(xLabel(data[i].date), xPos(i), pad.top + ch + 8);
   });
 
