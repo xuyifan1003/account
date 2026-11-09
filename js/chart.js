@@ -1,4 +1,8 @@
 import { getState } from './state.js';
+import { haptic } from './utils.js';
+
+let hitPoints = [];   // {x, y, value, date} — 点按吸附用
+let selectedIdx = -1; // 当前选中的点（-1 = 无）
 
 export function renderAssetChart() {
   const canvas = document.getElementById('asset-trend-chart');
@@ -25,7 +29,10 @@ export function renderAssetChart() {
   const ctx = canvas.getContext('2d');
   ctx.scale(dpr, dpr);
 
-  const data = [...snapshots].sort((a, b) => a.date.localeCompare(b.date));
+  const raw = [...snapshots].sort((a, b) => a.date.localeCompare(b.date));
+  const data = aggregate(raw);
+  const n = data.length;
+  if (selectedIdx >= n) selectedIdx = -1;
 
   const pad = { top: 30, right: 26, bottom: 36, left: 46 };
   const cw = w - pad.left - pad.right;
@@ -44,15 +51,10 @@ export function renderAssetChart() {
   const grid = '#E8ECF0';
   const plotBg = '#F8F9FA';
 
-  const tickCount = 4;
-  const tickStep = paddedRange / tickCount;
-  const niceStep = niceRound(tickStep);
-  const niceMin = Math.floor(paddedMin / niceStep) * niceStep;
-  const niceMax = Math.ceil(paddedMax / niceStep) * niceStep;
-  const niceRange = niceMax - niceMin || 1;
-
-  const yPos = v => pad.top + ch - ((v - niceMin) / niceRange) * ch;
-  const xPos = i => pad.left + (i / (data.length - 1)) * cw;
+  // 纵轴刻度步长：范围大时 ≥1万（整数万标签），范围小时自动降级到千
+  const tickStep = Math.max(niceRound(paddedRange / 4), 100);
+  const yPos = v => pad.top + ch - ((v - paddedMin) / paddedRange) * ch;
+  const xPos = i => pad.left + (n === 1 ? cw / 2 : (i / (n - 1)) * cw);
 
   ctx.clearRect(0, 0, w, h);
 
@@ -61,22 +63,23 @@ export function renderAssetChart() {
   roundRect(ctx, pad.left, pad.top, cw, ch, 4);
   ctx.fill();
 
-  // Grid lines & Y labels
+  // Grid lines & Y labels（范围 ≥2万 → 整数万；否则 → 千）
   ctx.textAlign = 'right';
   ctx.textBaseline = 'middle';
   ctx.font = '10px -apple-system, sans-serif';
-
-  for (let v = niceMin; v <= niceMax + 0.01; v += niceStep) {
+  const useWan = paddedRange >= 20000;
+  const yLabel = v => useWan ? Math.round(v / 10000) + '万' : Math.round(v / 1000) + '千';
+  for (let v = Math.ceil(paddedMin / tickStep) * tickStep; v <= paddedMax + 0.01; v += tickStep) {
     const y = yPos(v);
+    if (y < pad.top - 2 || y > pad.top + ch + 2) continue;
     ctx.beginPath();
     ctx.strokeStyle = grid;
     ctx.lineWidth = 1;
     ctx.moveTo(pad.left, y);
     ctx.lineTo(w - pad.right, y);
     ctx.stroke();
-
     ctx.fillStyle = muted;
-    ctx.fillText(formatAxisLabel(v), pad.left - 8, y);
+    ctx.fillText(yLabel(v), pad.left - 8, y);
   }
 
   // Gradient fill
@@ -86,10 +89,10 @@ export function renderAssetChart() {
 
   ctx.beginPath();
   ctx.moveTo(xPos(0), yPos(data[0].total_balance));
-  for (let i = 1; i < data.length; i++) {
+  for (let i = 1; i < n; i++) {
     ctx.lineTo(xPos(i), yPos(data[i].total_balance));
   }
-  ctx.lineTo(xPos(data.length - 1), pad.top + ch);
+  ctx.lineTo(xPos(n - 1), pad.top + ch);
   ctx.lineTo(xPos(0), pad.top + ch);
   ctx.closePath();
   ctx.fillStyle = grad;
@@ -98,7 +101,7 @@ export function renderAssetChart() {
   // Line
   ctx.beginPath();
   ctx.moveTo(xPos(0), yPos(data[0].total_balance));
-  for (let i = 1; i < data.length; i++) {
+  for (let i = 1; i < n; i++) {
     ctx.lineTo(xPos(i), yPos(data[i].total_balance));
   }
   ctx.strokeStyle = prime;
@@ -107,40 +110,133 @@ export function renderAssetChart() {
   ctx.lineCap = 'round';
   ctx.stroke();
 
-  // Dots
-  data.forEach((d, i) => {
-    const x = xPos(i);
-    const y = yPos(d.total_balance);
-    ctx.beginPath();
-    ctx.arc(x, y, 4, 0, Math.PI * 2);
-    ctx.fillStyle = '#fff';
-    ctx.fill();
-    ctx.strokeStyle = prime;
-    ctx.lineWidth = 2;
-    ctx.stroke();
-  });
+  // Dots（点多时缩小/隐藏，只留线）
+  const dotR = n > 20 ? 0 : (n > 15 ? 2.5 : 4);
+  if (dotR > 0) {
+    data.forEach((d, i) => {
+      ctx.beginPath();
+      ctx.arc(xPos(i), yPos(d.total_balance), dotR, 0, Math.PI * 2);
+      ctx.fillStyle = '#fff';
+      ctx.fill();
+      ctx.strokeStyle = prime;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    });
+  }
 
-  // X labels
+  // X labels: "YY.MM" 抽稀，最多 8 个，首尾必显示
   ctx.textAlign = 'center';
   ctx.textBaseline = 'top';
   ctx.fillStyle = muted;
   ctx.font = '10px -apple-system, sans-serif';
-
-  const maxLabels = Math.max(2, Math.min(data.length, Math.floor(cw / 55)));
-  const step = data.length > 1 ? Math.max(1, Math.floor((data.length - 1) / (maxLabels - 1))) : 1;
-
-  data.forEach((d, i) => {
-    if (i === 0 || i === data.length - 1 || i % step === 0) {
-      ctx.fillText(d.date.slice(5), xPos(i), pad.top + ch + 8);
-    }
+  const maxLabels = Math.max(2, Math.min(n, Math.floor(cw / 45), 8));
+  const labelStep = n > 1 ? Math.ceil((n - 1) / (maxLabels - 1)) : 1;
+  const shown = new Set();
+  for (let i = 0; i < n; i += labelStep) shown.add(i);
+  shown.add(n - 1);
+  [...shown].sort((a, b) => a - b).forEach(i => {
+    ctx.fillText(xLabel(data[i].date), xPos(i), pad.top + ch + 8);
   });
 
+  // 点击吸附点缓存 + 高亮
+  hitPoints = data.map((d, i) => ({
+    x: xPos(i),
+    y: yPos(d.total_balance),
+    value: d.total_balance,
+    date: d.date,
+  }));
+
+  if (selectedIdx >= 0 && selectedIdx < n) {
+    drawHighlight(ctx, hitPoints[selectedIdx], pad, w);
+  }
+
+  ensureTapHandler(canvas);
 }
 
-function formatAxisLabel(v) {
-  if (v >= 10000) return (v / 10000).toFixed(1) + '万';
-  if (v >= 1000) return (v / 1000).toFixed(1) + '千';
-  return Math.round(v).toString();
+/* ===== 聚合：点数 >30 时按时间跨度自动降粒度（日 → 月 → 季 → 年），目标 ≤12 点 ===== */
+function aggregate(data) {
+  if (data.length <= 30) return data;
+  const d0 = new Date(data[0].date + 'T00:00:00');
+  const d1 = new Date(data[data.length - 1].date + 'T00:00:00');
+  const spanDays = Math.round((d1 - d0) / 86400000);
+  let key;
+  if (spanDays <= 365) {
+    key = ds => ds.slice(0, 7);                                    // 月
+  } else if (spanDays <= 365 * 3) {
+    key = ds => { const [y, m] = ds.split('-').map(Number); return `${y}-Q${Math.ceil(m / 3)}`; };  // 季
+  } else {
+    key = ds => ds.slice(0, 4);                                    // 年
+  }
+  const last = new Map();
+  for (const p of data) last.set(key(p.date), p);   // 每组取最后一次快照
+  return [...last.values()].sort((a, b) => a.date.localeCompare(b.date));
+}
+
+/* ===== 横坐标标签："YY.MM" ===== */
+function xLabel(dateStr) {
+  const [y, m] = dateStr.split('-');
+  return `${y.slice(2)}.${m}`;
+}
+
+/* ===== 点按：吸附最近点，高亮 + 只显示金额（0.1万精度） ===== */
+function ensureTapHandler(canvas) {
+  if (canvas._tapBound) return;
+  canvas._tapBound = true;
+  canvas.addEventListener('click', e => {
+    if (!hitPoints.length) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    let best = -1, bestD = 44 * 44;   // 44px 吸附半径
+    for (let i = 0; i < hitPoints.length; i++) {
+      const dx = hitPoints[i].x - x, dy = hitPoints[i].y - y;
+      const d = dx * dx + dy * dy;
+      if (d < bestD) { bestD = d; best = i; }
+    }
+    if (best >= 0) {
+      haptic();
+      selectedIdx = (selectedIdx === best) ? -1 : best;
+    } else {
+      selectedIdx = -1;
+    }
+    renderAssetChart();
+  });
+}
+
+function drawHighlight(ctx, pt, pad, w) {
+  const prime = '#4A4A4A';
+  // 高亮圆点
+  ctx.beginPath();
+  ctx.arc(pt.x, pt.y, 6.5, 0, Math.PI * 2);
+  ctx.fillStyle = '#fff';
+  ctx.fill();
+  ctx.strokeStyle = prime;
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // 金额标签（0.1万 = 精确到千），只显示金额
+  const label = fmtAmount(pt.value);
+  ctx.font = 'bold 11px -apple-system, sans-serif';
+  const tw = ctx.measureText(label).width;
+  const pillW = tw + 14;
+  const pillH = 20;
+  let px = Math.max(pad.left, Math.min(pt.x - pillW / 2, w - pad.right - pillW));
+  let py = pt.y - pillH - 10;
+  if (py < 4) py = pt.y + 12;   // 靠顶时改到点下方
+
+  ctx.beginPath();
+  roundRect(ctx, px, py, pillW, pillH, 6);
+  ctx.fillStyle = prime;
+  ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(label, px + pillW / 2, py + pillH / 2 + 0.5);
+}
+
+function fmtAmount(v) {
+  if (v >= 10000) return (v / 10000).toFixed(1) + '万';   // 0.1万 = 精确到千
+  return Math.round(v / 1000) + '千';
 }
 
 function roundRect(ctx, x, y, w, h, r) {
