@@ -102,13 +102,13 @@ function refreshData() {
   }).catch(() => markStaleIfAny());
 }
 
-/* ===== 图表布局（随容器高度自适应） ===== */
+/* ===== 图表布局（随容器高度自适应，撑满画布） ===== */
 function layoutFor(h) {
   const mainTop = 10;
-  const mainH = Math.round(h * 0.42);
-  const datesTop = mainTop + mainH + 8;
-  const volTop = datesTop + 24;
-  const volH = Math.max(36, Math.round(h * 0.15));
+  const mainH = Math.round(h * 0.52);
+  const datesTop = mainTop + mainH + 7;
+  const volTop = datesTop + 20;
+  const volH = Math.max(40, h - volTop - 10);
   return { mainTop, mainH, datesTop, volTop, volH };
 }
 
@@ -196,6 +196,17 @@ function renderChart() {
 }
 
 /* ===== 窗口状态 ===== */
+function niceBounds(lo, hi) {
+  if (!isFinite(lo) || !isFinite(hi) || hi <= lo) { hi = lo + 1; }
+  const pad = (hi - lo) * 0.06 || hi * 0.01;
+  lo -= pad; hi += pad;
+  const raw = (hi - lo) / 5;
+  const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const norm = raw / mag;
+  const step = (norm <= 1 ? 1 : norm <= 2 ? 2 : norm <= 5 ? 5 : 10) * mag;
+  return { min: Math.floor(lo / step) * step, max: Math.ceil(hi / step) * step };
+}
+
 function setWindow(vs, ve) {
   const n = lastN;
   const span = clamp(ve - vs, MIN_SPAN, n - 1);
@@ -209,7 +220,19 @@ function setWindow(vs, ve) {
 
 function applyWindow() {
   if (!chart || !win) return;
-  chart.setOption({ xAxis: [{ min: win.vs, max: win.ve }, { min: win.vs, max: win.ve }] });
+  const D = parse(klines);
+  // y 轴按可见区间重算：价格取区间内最低/最高，成交额取区间内最大
+  let lo = Infinity, hi = -Infinity, vmax = 0;
+  for (let i = win.vs; i <= win.ve; i++) {
+    if (D.lows[i] < lo) lo = D.lows[i];
+    if (D.highs[i] > hi) hi = D.highs[i];
+    if (D.vols[i] > vmax) vmax = D.vols[i];
+  }
+  const b = niceBounds(lo, hi);
+  chart.setOption({
+    xAxis: [{ min: win.vs, max: win.ve }, { min: win.vs, max: win.ve }],
+    yAxis: [{ min: b.min, max: b.max }, { min: 0, max: vmax * 1.05 }]
+  });
 }
 
 /* ===== 统计卡片 + 首尾日期 ===== */
@@ -299,45 +322,30 @@ function bindSlider() {
   slider.addEventListener('pointercancel', end);
 }
 
-/* ===== 图表手势：单指平移 / 双指捏合缩放（低灵敏度） ===== */
+/* ===== 图表手势：仅双指捏合调窗口大小（低灵敏度）；平移只通过底部滑动条 ===== */
 function bindGestures() {
   const el = document.getElementById('nasdaq-chart');
   const dist2 = t => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
-  const baseline = t => t.length === 1
-    ? { mode: 'pan', x: t[0].clientX, vs: win.vs, span: win.ve - win.vs }
-    : { mode: 'pinch', d0: dist2(t), span0: win.ve - win.vs, center0: (win.vs + win.ve) / 2 };
+  const pinchBaseline = t => ({ d0: dist2(t), span0: win.ve - win.vs, center0: (win.vs + win.ve) / 2 });
 
   el.addEventListener('touchstart', e => {
-    if (!klines || !win || thumbDragging) return;
-    e.preventDefault();
-    const t = e.touches;
-    touch = baseline(t);
-  }, { passive: false });
+    // 只在双指落下时进入捏合模式；单指不响应（平移归底部滑动条）
+    touch = e.touches.length >= 2 && klines && win ? pinchBaseline(e.touches) : null;
+  }, { passive: true });
 
   el.addEventListener('touchmove', e => {
     if (!touch || !klines || !win) return;
+    if (e.touches.length < 2) { touch = null; return; }
     e.preventDefault();
-    const t = e.touches;
-    if (touch.mode === 'pan' && t.length === 1) {
-      const plotW = chart.getWidth() - GRID_LEFT - GRID_RIGHT;
-      const ipp = (win.ve - win.vs) / Math.max(plotW, 1);   // 每 px 对应天数
-      const dx = t[0].clientX - touch.x;
-      const vs = clamp(Math.round(touch.vs - dx * ipp), 0, lastN - 1 - touch.span);
-      setWindow(vs, vs + touch.span);
-    } else if (touch.mode === 'pinch' && t.length >= 2) {
-      const d = dist2(t);
-      if (d < 10) return;
-      const span = clamp(Math.round(touch.span0 * Math.pow(touch.d0 / d, PINCH_EASE)), MIN_SPAN, lastN - 1);
-      const vs = clamp(Math.round(touch.center0 - span / 2), 0, lastN - 1 - span);
-      setWindow(vs, vs + span);
-    } else {
-      // 手指数变化，重建基线
-      touch = baseline(t);
-    }
+    const d = dist2(e.touches);
+    if (d < 10) return;
+    const span = clamp(Math.round(touch.span0 * Math.pow(touch.d0 / d, PINCH_EASE)), MIN_SPAN, lastN - 1);
+    const vs = clamp(Math.round(touch.center0 - span / 2), 0, lastN - 1 - span);
+    setWindow(vs, vs + span);
   }, { passive: false });
 
   el.addEventListener('touchend', e => {
-    touch = e.touches.length ? baseline(e.touches) : null;
+    touch = e.touches.length >= 2 && win ? pinchBaseline(e.touches) : null;
   });
   el.addEventListener('touchcancel', () => { touch = null; });
 }
