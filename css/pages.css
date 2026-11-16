@@ -380,6 +380,7 @@
 
 .summary-amount.nasdaq-return::before { content: ''; margin: 0; }
 .summary-amount.nasdaq-return { color: #FCA5A5; }
+#nasdaq-sub { margin-top: 10px; }
 
 .nasdaq-stats {
   display: flex;

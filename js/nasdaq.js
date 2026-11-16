@@ -83,6 +83,7 @@ function applyData(kl, isStale) {
   lastN = n;
   updateStats();
   updateThumb();
+  syncPresetHighlight();
   // 页面已激活就立即渲染；未激活等 showNasdaq() 触发
   if (document.getElementById('page-nasdaq').classList.contains('active')) renderChart();
 }
@@ -269,18 +270,17 @@ function updateStats() {
 }
 
 /* ===== 快捷区间 ===== */
+let activePreset = 244; // 当前选中的快捷按钮（-1 = 无，手动捏合/拖动后清空）
+
 function syncPresetHighlight() {
-  if (!klines || !win) return;
-  const span = win.ve - win.vs;
   document.querySelectorAll('.np-btn').forEach(b => {
-    const n = +b.dataset.n;
-    const match = n === 0 ? span >= lastN - 2 : span === n;
-    b.classList.toggle('on', match);
+    b.classList.toggle('on', +b.dataset.n === activePreset);
   });
 }
 
 function setPreset(n) {
   if (!klines) return;
+  activePreset = n;
   const end = lastN - 1;
   const start = n > 0 ? Math.max(0, lastN - n) : 0;
   setWindow(start, end);
@@ -303,6 +303,7 @@ function bindSlider() {
   if (!slider) return;
   const dragTo = e => {
     if (!klines || !win) return;
+    activePreset = -1;
     const rect = slider.getBoundingClientRect();
     const frac = clamp((e.clientX - rect.left) / rect.width, 0, 1);
     const span = win.ve - win.vs;
@@ -310,15 +311,22 @@ function bindSlider() {
     const vs = clamp(Math.round(center - span / 2), 0, lastN - 1 - span);
     setWindow(vs, vs + span);
   };
+  // 滑动期间隐藏悬浮框和竖虚线
+  const setTooltipEnabled = on => { if (chart) chart.setOption({ tooltip: { show: on } }); };
   slider.addEventListener('pointerdown', e => {
     e.preventDefault();
     thumbDragging = true;
     try { slider.setPointerCapture(e.pointerId); } catch (err) {}
     haptic();
+    setTooltipEnabled(false);
     dragTo(e);
   });
   slider.addEventListener('pointermove', e => { if (thumbDragging) dragTo(e); });
-  const end = () => { thumbDragging = false; };
+  const end = () => {
+    if (!thumbDragging) return;
+    thumbDragging = false;
+    setTooltipEnabled(true);
+  };
   slider.addEventListener('pointerup', end);
   slider.addEventListener('pointercancel', end);
 }
@@ -340,6 +348,7 @@ function bindGestures() {
     e.preventDefault();
     const d = dist2(e.touches);
     if (d < 10) return;
+    activePreset = -1;
     const span = clamp(Math.round(touch.span0 * Math.pow(touch.d0 / d, PINCH_EASE)), MIN_SPAN, lastN - 1);
     const vs = clamp(Math.round(touch.center0 - span / 2), 0, lastN - 1 - span);
     setWindow(vs, vs + span);
