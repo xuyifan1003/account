@@ -363,29 +363,43 @@
   font-weight: 700;
 }
 
-/* ===== Nasdaq Page ===== */
+/* ===== Nasdaq Page（一屏固定布局，不滚动） ===== */
+#page-nasdaq.active {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  gap: 8px;
+  padding-top: var(--safe-top);
+  padding-bottom: calc(var(--tab-height) + var(--safe-bottom) + 4px);
+}
+#page-nasdaq .summary-card {
+  flex-shrink: 0;
+  padding: 14px 18px;
+  margin-bottom: 0;
+}
+
 .summary-amount.nasdaq-return::before { content: ''; margin: 0; }
 .summary-amount.nasdaq-return { color: #FCA5A5; }
 
 .nasdaq-stats {
   display: flex;
   gap: 8px;
-  margin-bottom: 10px;
+  flex-shrink: 0;
 }
 .nasdaq-stat {
   flex: 1;
   background: var(--card);
   border-radius: var(--radius-sm);
-  padding: 10px 12px;
+  padding: 8px 12px;
   box-shadow: var(--card-shadow);
   font-size: 11px;
   color: var(--text-secondary);
 }
 .nasdaq-stat b {
   display: block;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
-  margin-top: 3px;
+  margin-top: 2px;
   letter-spacing: -0.3px;
   color: var(--text);
 }
@@ -395,7 +409,7 @@
 .nasdaq-presets {
   display: flex;
   gap: 8px;
-  margin-bottom: 10px;
+  flex-shrink: 0;
 }
 .nasdaq-presets .np-btn {
   flex: 1;
@@ -418,11 +432,13 @@
 
 .nasdaq-chart-wrap {
   position: relative;
+  flex: 1;
+  min-height: 0;
   background: var(--card);
   border-radius: var(--radius);
   box-shadow: var(--card-shadow);
 }
-#nasdaq-chart { width: 100%; height: 400px; }
+#nasdaq-chart { width: 100%; height: 100%; }
 .nasdaq-range {
   position: absolute;
   top: 198px;
@@ -433,4 +449,31 @@
   font-size: 10px;
   color: var(--text-tertiary);
   pointer-events: none;
+}
+
+/* 底部自定义区间滑动条 */
+.nasdaq-slider {
+  position: relative;
+  height: 20px;
+  flex-shrink: 0;
+  touch-action: none;
+  cursor: pointer;
+}
+.nasdaq-slider .ns-track {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  top: 9px;
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+}
+.nasdaq-slider .ns-thumb {
+  position: absolute;
+  top: 4px;
+  height: 13px;
+  min-width: 28px;
+  background: var(--primary);
+  border-radius: 7px;
+  opacity: 0.85;
 }
