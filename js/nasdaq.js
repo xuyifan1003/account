@@ -102,13 +102,14 @@ function refreshData() {
   }).catch(() => markStaleIfAny());
 }
 
-/* ===== 图表布局（随容器高度自适应，撑满画布） ===== */
+/* ===== 图表布局（随容器高度自适应，撑满画布）
+   成交额图压小（约15%），主图吸收剩余空间（参考桌面版主图:成交额≈10:3的压缩关系） ===== */
 function layoutFor(h) {
   const mainTop = 10;
-  const mainH = Math.round(h * 0.52);
-  const datesTop = mainTop + mainH + 7;
-  const volTop = datesTop + 20;
-  const volH = Math.max(40, h - volTop - 10);
+  const volH = Math.max(40, Math.round(h * 0.15));
+  const volTop = h - 10 - volH;
+  const datesTop = volTop - 22;
+  const mainH = Math.max(120, datesTop - mainTop - 7);
   return { mainTop, mainH, datesTop, volTop, volH };
 }
 
@@ -125,10 +126,10 @@ function option(D, L) {
     tooltip: {
       trigger: 'axis',
       axisPointer: { type: 'line', lineStyle: { color: '#c9cdd4', type: 'dashed' } },
-      backgroundColor: 'rgba(255,255,255,.78)',
-      borderColor: 'rgba(229,230,235,.6)',
+      backgroundColor: 'rgba(255,255,255,.5)',
+      borderColor: 'rgba(229,230,235,.4)',
       textStyle: { color: '#1f2329', fontSize: 12 },
-      extraCssText: 'backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,.06);',
+      extraCssText: 'backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,.05);',
       confine: true,
       position: (point, params, dom, rect, size) => {
         const x = Math.min(Math.max(point[0] - size.contentSize[0] / 2, 6), size.viewSize[0] - size.contentSize[0] - 6);
@@ -141,7 +142,7 @@ function option(D, L) {
         const cls = pct > 0 ? UP : pct < 0 ? DOWN : '#4e5969';
         return `<b>${D.dates[i]}</b><br/>`
           + `涨跌幅：<b style="color:${cls}">${pct === null ? '—' : (pct > 0 ? '+' : '') + pct.toFixed(2) + '%'}</b><br/>`
-          + `成交额：${fmtVol(D.vols[i])} 十亿美元`;
+          + `成交额：${fmtVol(D.vols[i])}`;
       }
     },
     axisPointer: { link: [{ xAxisIndex: 'all' }], label: { show: false } },

@@ -374,7 +374,7 @@
 }
 #page-nasdaq .summary-card {
   flex-shrink: 0;
-  padding: 14px 18px;
+  padding: 18px 18px;
   margin-bottom: 0;
 }
 
@@ -383,23 +383,23 @@
 
 .nasdaq-stats {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   flex-shrink: 0;
 }
 .nasdaq-stat {
   flex: 1;
   background: var(--card);
   border-radius: var(--radius-sm);
-  padding: 8px 12px;
+  padding: 13px 15px;
   box-shadow: var(--card-shadow);
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-secondary);
 }
 .nasdaq-stat b {
   display: block;
-  font-size: 15px;
+  font-size: 18px;
   font-weight: 700;
-  margin-top: 2px;
+  margin-top: 4px;
   letter-spacing: -0.3px;
   color: var(--text);
 }
@@ -408,13 +408,13 @@
 
 .nasdaq-presets {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   flex-shrink: 0;
 }
 .nasdaq-presets .np-btn {
   flex: 1;
-  padding: 7px 0;
-  font-size: 12px;
+  padding: 12px 0;
+  font-size: 13px;
   font-weight: 600;
   font-family: inherit;
   background: var(--card);
@@ -451,29 +451,15 @@
   pointer-events: none;
 }
 
-/* 底部自定义区间滑动条（低调配色） */
+/* 底部平移手势区：完全隐形，占满卡片下方的剩余空间，左右滑=平移区间 */
 .nasdaq-slider {
   position: relative;
-  height: 16px;
+  height: 40px;
   flex-shrink: 0;
   touch-action: none;
-  cursor: pointer;
+  cursor: grab;
 }
-.nasdaq-slider .ns-track {
-  position: absolute;
-  left: 4px;
-  right: 4px;
-  top: 8px;
-  height: 2px;
-  background: var(--border);
-  border-radius: 1px;
-}
+.nasdaq-slider .ns-track,
 .nasdaq-slider .ns-thumb {
-  position: absolute;
-  top: 5px;
-  height: 8px;
-  min-width: 24px;
-  background: var(--text-tertiary);
-  border-radius: 4px;
-  opacity: 0.45;
+  visibility: hidden;
 }
