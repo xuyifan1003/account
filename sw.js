@@ -15,6 +15,8 @@ const URLS = [
   'js/report.js',
   'js/db.js',
   'js/chart.js',
+  'js/echarts.min.js',
+  'js/nasdaq.js',
   'js/app.js',
 ];
 

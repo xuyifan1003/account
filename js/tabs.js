@@ -1,5 +1,6 @@
 import { renderReport } from './report.js';
 import { resetAssetsVisibility } from './assets.js';
+import { showNasdaq } from './nasdaq.js';
 import { haptic } from './utils.js';
 
 let currentTab = 'book';
@@ -17,6 +18,7 @@ export function switchTab(tabName) {
 
   if (tabName === 'report') renderReport();
   if (tabName === 'assets') resetAssetsVisibility();
+  if (tabName === 'nasdaq') showNasdaq();
 }
 
 export function initTabs() {
