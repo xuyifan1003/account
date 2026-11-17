@@ -1,9 +1,10 @@
-/* 纳指页：实时拉取东方财富日线（2025-01-01 起，只增不减），缓存秒开，断网兜底
-   交互：双指捏合调窗口大小（低灵敏度）、单指左右拖平移、底部滑动条平移 */
+/* 纳指页：实时拉取东方财富日线（纳斯达克100，2025-01-01 起，只增不减），缓存秒开，断网兜底
+   交互：双指捏合调窗口大小（低灵敏度）、底部隐形手势区左右滑=平移
+   下图：回撤曲线（距区间新高的百分比），替代无参考价值的成交额 */
 import { haptic, showToast } from './utils.js';
 
 const CACHE_KEY = 'nasdaq-kline-v1';
-const API_BASE = 'https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=100.NDX'
+const API_BASE = 'https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=100.NDX100'
   + '&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57&klt=101&fqt=1&beg=20250101';
 
 const UP = '#e13e3e';
@@ -31,19 +32,22 @@ function stdev(arr) {
 function fmt(n) {
   return n.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
-function fmtVol(v) { return (v / 1e9).toFixed(2); }
 function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 
 function parse(kl) {
-  const dates = [], opens = [], closes = [], highs = [], lows = [], vols = [];
+  const dates = [], closes = [], highs = [], lows = [], dd = [];
+  let peak = -Infinity;
   for (const row of kl) {
     const p = row.split(',');
-    dates.push(p[0]); opens.push(+p[1]); closes.push(+p[2]);
-    highs.push(+p[3]); lows.push(+p[4]); vols.push(+p[5]);
+    const close = +p[2];
+    dates.push(p[0]); closes.push(close);
+    highs.push(+p[3]); lows.push(+p[4]);
+    if (close > peak) peak = close;
+    dd.push((close / peak - 1) * 100);   // 距区间新高的百分比（全量数据口径）
   }
   const pcts = [null];
   for (let i = 1; i < closes.length; i++) pcts.push((closes[i] / closes[i - 1] - 1) * 100);
-  return { dates, closes, highs, lows, vols, pcts, n: dates.length };
+  return { dates, closes, highs, lows, dd, pcts, n: dates.length };
 }
 
 /* ===== 数据获取与缓存 ===== */
@@ -125,6 +129,7 @@ function option(D, L) {
   return {
     animation: false,
     tooltip: {
+      show: tooltipOn,
       trigger: 'axis',
       axisPointer: { type: 'line', lineStyle: { color: '#c9cdd4', type: 'dashed' } },
       backgroundColor: 'rgba(255,255,255,.5)',
@@ -140,10 +145,11 @@ function option(D, L) {
       formatter: params => {
         const i = params[0].dataIndex;
         const pct = D.pcts[i];
+        const dd = D.dd[i];
         const cls = pct > 0 ? UP : pct < 0 ? DOWN : '#4e5969';
         return `<b>${D.dates[i]}</b><br/>`
           + `涨跌幅：<b style="color:${cls}">${pct === null ? '—' : (pct > 0 ? '+' : '') + pct.toFixed(2) + '%'}</b><br/>`
-          + `成交额：${fmtVol(D.vols[i])}`;
+          + `距新高：<b style="color:${DOWN}">${dd.toFixed(2) + '%'}</b>`;
       }
     },
     axisPointer: { link: [{ xAxisIndex: 'all' }], label: { show: false } },
@@ -160,7 +166,7 @@ function option(D, L) {
     yAxis: [
       { gridIndex: 0, scale: true, splitLine: { lineStyle: { color: '#f0f1f3' } },
         axisLabel: { color: '#94a3b8', fontSize: 10 } },
-      { gridIndex: 1, splitLine: { show: false }, axisLabel: { show: false }, min: 0 }
+      { gridIndex: 1, min: -10, max: 0, splitLine: { show: false }, axisLabel: { show: false } }
     ],
     series: [
       {
@@ -173,12 +179,14 @@ function option(D, L) {
         }
       },
       {
-        name: '成交额', type: 'bar', xAxisIndex: 1, yAxisIndex: 1,
-        data: D.vols.map((v, i) => ({
-          value: v,
-          itemStyle: { color: D.pcts[i] >= 0 ? 'rgba(225,62,62,.55)' : 'rgba(10,143,76,.55)' }
-        })),
-        barWidth: '60%', barMaxWidth: 14
+        name: '回撤', type: 'line', xAxisIndex: 1, yAxisIndex: 1,
+        data: D.dd, showSymbol: false, lineStyle: { width: 1.2, color: DOWN },
+        areaStyle: {
+          origin: 'start',
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: 'rgba(10,143,76,.02)' },
+            { offset: 1, color: 'rgba(10,143,76,.32)' }])
+        }
       }
     ]
   };
@@ -223,17 +231,20 @@ function setWindow(vs, ve) {
 function applyWindow() {
   if (!chart || !win) return;
   const D = parse(klines);
-  // y 轴按可见区间重算：价格取区间内最低/最高，成交额取区间内最大
-  let lo = Infinity, hi = -Infinity, vmax = 0;
+  // y 轴按可见区间重算：价格取区间内最低/最高，回撤取区间内最深值
+  let lo = Infinity, hi = -Infinity, ddMin = 0;
   for (let i = win.vs; i <= win.ve; i++) {
     if (D.lows[i] < lo) lo = D.lows[i];
     if (D.highs[i] > hi) hi = D.highs[i];
-    if (D.vols[i] > vmax) vmax = D.vols[i];
+    if (D.dd[i] < ddMin) ddMin = D.dd[i];
   }
   const b = niceBounds(lo, hi);
   chart.setOption({
     xAxis: [{ min: win.vs, max: win.ve }, { min: win.vs, max: win.ve }],
-    yAxis: [{ min: b.min, max: b.max }, { min: 0, max: vmax * 1.05 }]
+    yAxis: [
+      { min: b.min, max: b.max },
+      { min: Math.min(ddMin * 1.2, -1), max: 0 }
+    ]
   });
 }
 
@@ -298,6 +309,19 @@ function updateThumb() {
   thumb.style.width = 'calc(' + widthPct + '% - 8px)';
 }
 
+/* ===== 底部平移手势区（滑动期间及之后悬浮框保持隐藏，触摸图表才恢复） ===== */
+let tooltipOn = true;
+function setTooltipEnabled(on) {
+  tooltipOn = on;
+  if (!chart) return;
+  if (on) {
+    chart.setOption({ tooltip: { show: true } });
+  } else {
+    chart.dispatchAction({ type: 'hideTip' });
+    chart.setOption({ tooltip: { show: false } });
+  }
+}
+
 function bindSlider() {
   const slider = document.getElementById('nasdaq-slider');
   if (!slider) return;
@@ -311,22 +335,16 @@ function bindSlider() {
     const vs = clamp(Math.round(center - span / 2), 0, lastN - 1 - span);
     setWindow(vs, vs + span);
   };
-  // 滑动期间隐藏悬浮框和竖虚线
-  const setTooltipEnabled = on => { if (chart) chart.setOption({ tooltip: { show: on } }); };
   slider.addEventListener('pointerdown', e => {
     e.preventDefault();
     thumbDragging = true;
     try { slider.setPointerCapture(e.pointerId); } catch (err) {}
     haptic();
-    setTooltipEnabled(false);
+    setTooltipEnabled(false);   // 按下即隐藏，松手不恢复
     dragTo(e);
   });
   slider.addEventListener('pointermove', e => { if (thumbDragging) dragTo(e); });
-  const end = () => {
-    if (!thumbDragging) return;
-    thumbDragging = false;
-    setTooltipEnabled(true);
-  };
+  const end = () => { thumbDragging = false; };
   slider.addEventListener('pointerup', end);
   slider.addEventListener('pointercancel', end);
 }
@@ -338,6 +356,8 @@ function bindGestures() {
   const pinchBaseline = t => ({ d0: dist2(t), span0: win.ve - win.vs, center0: (win.vs + win.ve) / 2 });
 
   el.addEventListener('touchstart', e => {
+    if (!klines || !win) return;
+    if (!tooltipOn) setTooltipEnabled(true);   // 触摸图表时恢复悬浮框
     // 只在双指落下时进入捏合模式；单指不响应（平移归底部滑动条）
     touch = e.touches.length >= 2 && klines && win ? pinchBaseline(e.touches) : null;
   }, { passive: true });
