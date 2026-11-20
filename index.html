@@ -87,30 +87,63 @@
     </div>
   </section>
 
-  <!-- ===== Tab 4: 纳指 ===== -->
-  <section id="page-nasdaq" class="page">
-    <div class="summary-card">
-      <div class="summary-amount nasdaq-return" id="nasdaq-return">—</div>
-      <div class="summary-sub" id="nasdaq-sub">加载中…</div>
+  <!-- ===== Tab 4: 行情 ===== -->
+  <section id="page-quote" class="page quote-page">
+    <div class="quote-switch">
+      <button class="qs-btn active" data-q="ndx">纳指100</button>
+      <button class="qs-btn" data-q="gold">黄金9999</button>
     </div>
-    <div class="nasdaq-stats">
-      <div class="nasdaq-stat"><span>最大回撤</span><b id="nasdaq-dd" class="down">—</b></div>
-      <div class="nasdaq-stat"><span>年化波动率</span><b id="nasdaq-vol" class="muted">—</b></div>
+
+    <div class="quote-panel active" data-q="ndx">
+      <div class="summary-card">
+        <div class="summary-amount quote-return" data-role="ret">—</div>
+        <div class="summary-sub" data-role="sub">加载中…</div>
+      </div>
+      <div class="quote-stats">
+        <div class="quote-stat"><span>最大回撤</span><b data-role="dd" class="down">—</b></div>
+        <div class="quote-stat"><span>年化波动率</span><b data-role="vol">—</b></div>
+      </div>
+      <div class="quote-presets">
+        <button class="np-btn" data-n="5">近1周</button>
+        <button class="np-btn" data-n="21">近1月</button>
+        <button class="np-btn" data-n="63">近3月</button>
+        <button class="np-btn on" data-n="244">近1年</button>
+        <button class="np-btn" data-n="0">全部</button>
+      </div>
+      <div class="quote-chart-wrap">
+        <div class="quote-chart" data-role="chart"></div>
+        <div class="quote-range" data-role="range"><span data-role="rs"></span><span data-role="re"></span></div>
+      </div>
+      <div class="quote-slider" data-role="slider">
+        <div class="ns-track"></div>
+        <div class="ns-thumb" data-role="thumb"></div>
+      </div>
     </div>
-    <div class="nasdaq-presets">
-      <button class="np-btn" data-n="5">近1周</button>
-      <button class="np-btn" data-n="21">近1月</button>
-      <button class="np-btn" data-n="63">近3月</button>
-      <button class="np-btn" data-n="244">近1年</button>
-      <button class="np-btn" data-n="0">全部</button>
-    </div>
-    <div class="nasdaq-chart-wrap">
-      <div id="nasdaq-chart"></div>
-      <div class="nasdaq-range"><span id="nasdaq-rs"></span><span id="nasdaq-re"></span></div>
-    </div>
-    <div class="nasdaq-slider" id="nasdaq-slider">
-      <div class="ns-track"></div>
-      <div class="ns-thumb" id="nasdaq-thumb"></div>
+
+    <div class="quote-panel" data-q="gold">
+      <div class="summary-card">
+        <div class="summary-amount quote-return" data-role="ret">—</div>
+        <div class="summary-sub" data-role="sub">加载中…</div>
+      </div>
+      <div class="quote-stats">
+        <div class="quote-stat"><span>最大回撤</span><b data-role="dd" class="down">—</b></div>
+        <div class="quote-stat"><span>年化波动率</span><b data-role="vol">—</b></div>
+      </div>
+      <div class="quote-presets">
+        <button class="np-btn" data-n="5">近1周</button>
+        <button class="np-btn" data-n="21">近1月</button>
+        <button class="np-btn" data-n="63">近3月</button>
+        <button class="np-btn on" data-n="244">近1年</button>
+        <button class="np-btn" data-n="0">全部</button>
+      </div>
+      <div class="quote-chart-wrap">
+        <div class="quote-chart" data-role="chart"></div>
+        <div class="quote-range" data-role="range"><span data-role="rs"></span><span data-role="re"></span></div>
+      </div>
+      <div class="quote-slider" data-role="slider">
+        <div class="ns-track"></div>
+        <div class="ns-thumb" data-role="thumb"></div>
+      </div>
     </div>
   </section>
 
@@ -128,9 +161,9 @@
       <span class="tab-icon">📊</span>
       <span class="tab-label">报表</span>
     </button>
-    <button class="tab" data-tab="nasdaq">
+    <button class="tab" data-tab="quote">
       <span class="tab-icon">📈</span>
-      <span class="tab-label">纳指</span>
+      <span class="tab-label">行情</span>
     </button>
   </nav>
 </div>

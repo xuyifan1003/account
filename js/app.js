@@ -3,7 +3,7 @@ import { initTabs } from './tabs.js';
 import { initBook, renderRecords, renderBookSummary } from './book.js';
 import { initAssets, renderAssets } from './assets.js';
 import { initReport } from './report.js';
-import { initNasdaq } from './nasdaq.js';
+import { initQuotes } from './quotes.js';
 import { showToast } from './utils.js';
 
 /* ===== Refresh ===== */
@@ -41,7 +41,7 @@ async function init() {
   initBook();
   initAssets();
   initReport();
-  initNasdaq();
+  initQuotes();
 
   renderBookSummary();
   renderRecords({ animateAll: true });

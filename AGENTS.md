@@ -21,6 +21,12 @@ DOMContentLoaded → initTabs → initBook → initAssets → initReport
 - Two-phase render eliminates blank-screen wait
 - **Category migration**: `initState()` auto-migrates old `digital`/`communication` records → `daily` (both in-memory and via `api('PATCH')` on server)
 
+## 行情页（纳指 / 黄金）
+- `js/quote.js`：通用引擎工厂 `createQuote(cfg)`，管数据拉取、缓存、窗口平移/缩放、统计、图表
+- `js/quotes.js`：装配两个品种并处理页内切换（纳指100 `100.NDX100` / 黄金9999 `118.AU9999`，东财日线）
+- 每个品种各自持有 chart 实例与窗口状态；面板用 `display:none` 隐藏，切换时 `show()` 重新 resize + 渲染
+- DOM 用 `data-role` 定位（面板内不依赖 id），新增品种只需在 `quotes.js` 加一条配置 + HTML 加一个 `.quote-panel`
+
 ## Data flow
 - **DB**: Supabase REST via `js/db.js` (`api()`). Tables: `records`, `assets`, `asset_snapshots`
 - **Read**: `initState()` → `api('GET', ...)` from Supabase
